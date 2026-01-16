@@ -790,4 +790,7 @@ CMakeFiles/SatelliteTracker.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stack \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/stack.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/print \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/OrbitState.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/Vector3D.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/TimeUTC.h
