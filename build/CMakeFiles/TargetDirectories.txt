@@ -1,0 +1,3 @@
+/Users/flombardo/Documents/02. WORK/SpaceProjects/SatelliteTracker/build/CMakeFiles/SatelliteTracker.dir
+/Users/flombardo/Documents/02. WORK/SpaceProjects/SatelliteTracker/build/CMakeFiles/edit_cache.dir
+/Users/flombardo/Documents/02. WORK/SpaceProjects/SatelliteTracker/build/CMakeFiles/rebuild_cache.dir
