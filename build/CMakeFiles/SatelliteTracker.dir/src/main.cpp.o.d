@@ -793,4 +793,8 @@ CMakeFiles/SatelliteTracker.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h \
   /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/OrbitState.h \
   /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/Vector3D.h \
-  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/TimeUTC.h
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/domain/TimeUTC.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/ConstantVelocityPropagator.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/OrbitPropagator.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/OrbitState.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/TimeUTC.h

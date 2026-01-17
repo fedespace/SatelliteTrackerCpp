@@ -1,5 +1,6 @@
 #include <iostream>
 #include "domain/OrbitState.h" // only this is enough, it contains the others
+#include "propagation/ConstantVelocityPropagator.h"
 
 int main() {
     
@@ -15,7 +16,19 @@ int main() {
 
         sat.UNIXepoch.validate(); // If this raises the error invalid_argument, then the code goes straight to the catch section below.
 
-        std::cout << "Position norm [km]: " << sat.position_km.norm();
+        // trying to use a target date for the constant velocity propagator, and verify that
+        TimeUTC finalEpoch{2026,1,16,12,10,0.0};
+        finalEpoch.validate();
+
+        std::cout << "Position norm [km]: " << sat.position_km.norm() << std::endl;
+
+        // Let's initialise the constant velocity propagator
+        ConstantVelocityPropagator propagator;
+        // And let's propagate the state using it
+        OrbitState propagated = propagator.propagate(sat, finalEpoch);
+
+        std::cout << "Propagation successful. New epoch minute is: " << propagated.UNIXepoch.minute << std::endl;
+
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what();
