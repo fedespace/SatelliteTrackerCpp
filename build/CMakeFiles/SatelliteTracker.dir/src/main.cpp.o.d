@@ -797,4 +797,9 @@ CMakeFiles/SatelliteTracker.dir/src/main.cpp.o: \
   /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/ConstantVelocityPropagator.h \
   /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/OrbitPropagator.h \
   /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/OrbitState.h \
-  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/TimeUTC.h
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/TimeUTC.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/propagation/../domain/TimeUtils.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/frames/EciToEcef.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/frames/FrameTransforms.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/frames/../domain/Vector3D.h \
+  /Users/flombardo/Documents/02.\ WORK/SpaceProjects/SatelliteTracker/src/frames/../domain/TimeUtils.h
