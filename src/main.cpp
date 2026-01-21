@@ -2,6 +2,7 @@
 #include "domain/OrbitState.h" 
 #include "propagation/ConstantVelocityPropagator.h"
 #include "frames/EciToEcef.h"
+#include "tle/TleParser.h"
 
 int main() {
     
@@ -39,7 +40,16 @@ int main() {
         Vector3D rEcef = rotateZ(Rz, rEci);
 
         // Printing the results for component x of the two vectors:
-        std::cout << "Eci vector: " << rEci.x << ", Ecef vector: " << rEcef.x; 
+        std::cout << "Eci vector: " << rEci.x << ", Ecef vector: " << rEcef.x << std::endl; 
+
+        // Parse now ISS TLE:
+        Tle ISS = TleParser (
+            "ISS (ZARYA)",
+            "1 25544U 98067A   26020.17509289  .00021194  00000+0  38548-3 0  9998",
+            "2 25544  51.6334 312.1983 0007785  38.3265 321.8276 15.49442598548811"
+        );
+
+        std::cout << ISS.name;
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what();
