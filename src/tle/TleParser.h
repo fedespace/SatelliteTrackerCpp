@@ -18,5 +18,10 @@ inline Tle TleParser (
         throw std::invalid_argument("Number of lines mismatch.");
     }
 
+    std::string yearDigits = line1.substr(19,20);
+    std::string dayOfYear = line1.substr(21,32);
+    
+
+
     return {name, line1, line2};
 }
