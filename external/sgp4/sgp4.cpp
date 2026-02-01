@@ -59,7 +59,7 @@
 *                           original baseline
 *       ----------------------------------------------------------------      */
 
-#include "SGP4.h"
+#include "sgp4.h"
 
 #include <string>
 #include <cstdlib> 

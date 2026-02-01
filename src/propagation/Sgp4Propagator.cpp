@@ -56,11 +56,10 @@ OrbitState Sgp4Propagator::propagate(
     double r[3], v[3]; // TEME reference frame in [km] and [km/s]
     SGP4Funcs::sgp4(satrec, m, r, v);
     
+    // The return r and v vector will be in TEME (True Equator, Mean Equinox) frame, which is quasi-inertial Earth-centered frame so the Earth doesn't rotate beneath the satellite. They will need to be converted into ECEF frame and then geodetic coordinates to get latitude and longitude
     return {
         {r[0], r[1], r[2]},
         {v[0], v[1], v[2]},
         targetTime
     };
 }
-
-// epoch2MJD2000(int targetYear, double dayFraction)
