@@ -115,3 +115,4 @@ inline bool leapYear(int year) {
     }
     return isLeap;
 }
+
