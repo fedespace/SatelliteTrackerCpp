@@ -4,20 +4,17 @@
 
 // ===============================
 
-// Assuming we are dealing with times in the same day
-inline double secondsBetween(const TimeUTC& t0, const TimeUTC& t1) {
-    return (t1.hour - t0.hour) * 3600.0 +
-            (t1.minute - t0.minute) * 60.0 +
-            (t1.second - t0.second);
-}
+// TLE epoch conversion to MJD2000 [min]
+double epoch2MJD2000_TLE(int year, double dayFrac);
 
-
-
-// Minutes from epoch to MJD2000 (decimal point)
-// TLE will come as (year, dayOfYear)
-// targetEpoch will come as (year, month, day, hour, minute, second)
+// targetEpoch conversion to MJD2000 [min]
 double epoch2MJD2000(const TimeUTC& targetTime);
 double epoch2MJD2000_TLE(int year, double dayFrac);
 
-// Computing the leap year
+// Leap year boolean
 bool leapYear(int year);
+
+// Validation of input
+void validate(const TimeUTC& time);
+
+// To be implemented: GO/NO-GO depending on orbit type (LEO, GEO, etc) and deltaT
