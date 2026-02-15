@@ -3,6 +3,7 @@
 #include "../domain/TimeUtils.h"
 #include <cstdlib>
 #include <cmath>
+#include "../domain/Tle.h"
 
 // ===============================
 
@@ -45,19 +46,64 @@ OrbitState Sgp4Propagator::propagate(
     );
 
     // Conversion TLE epoch [year, dayOfYear] to MJD2000. Output: [min]
-    int yearTLE = std::stoi("20"+tle.line1.substr(16,2));
-    double dayOfYearTLE = std::stod(tle.line1.substr(19,12));
+    int yearTLE = std::stoi("20"+tle.line1.substr(18,2));
+    double dayOfYearTLE = std::stod(tle.line1.substr(20,12));
     double minutesSinceEpochTLE = epoch2MJD2000_TLE(yearTLE, dayOfYearTLE);
 
     // Conversion targetTime [TimeUTC] to MJD2000. Output: [min]
     double minutesSinceEpochTarget = epoch2MJD2000(targetTime);
 
+    // Given the type or orbit, check maxDT, idealDT and errorMax
+    double mu = satrec.mus;
+    std::string type = typeOfOrbit(tle, mu);
+    int maxDT;
+    int idealDT;
+    int errorMax;
+    if (type == "LEO") {
+        idealDT = 1440; // 1 day
+        maxDT = 1440 * 3; // 3 days
+        errorMax = 10; // [km]
+    } else if (type == "MEO") {
+        maxDT = 1440 * 3; // 3 days
+        idealDT = maxDT;
+        errorMax = 20;
+    } else if (type == "GTO" || type == "HEO") {
+        maxDT = 1440 * 2; // 2 days
+        idealDT = maxDT;
+        errorMax = 0; // info unavailable
+    } else if (type == "GEO") {
+        maxDT = 1440 * 15; // 2 weeks
+        idealDT = maxDT;
+        errorMax = 0; // info unavailable
+    }
+
+    std::cout << "Type of orbit: " << type << std::endl;
+
     // Computing deltaT between TLE and finalEpoch
     double deltaT = minutesSinceEpochTarget - minutesSinceEpochTLE;
+    // std::cout << "Min tle: " << minutesSinceEpochTLE << " and min target: " << minutesSinceEpochTarget << std::endl;
+    // std::cout << deltaT << std::endl;
 
-    // Initialise position and velocity vectors [TEME], and propagate the orbit using SGP4
+    // Initialising vectors 
     double r[3], v[3]; // [km], [km/s]
-    SGP4Funcs::sgp4(satrec, deltaT, r, v);
+
+    // Compare to deltaT obtained in the previous step
+    if (deltaT > maxDT) {
+        std::cout << "TLE is invalid for this target epoch.\n";
+        std::cout << "Aborting...\n";
+    } else if (deltaT >= idealDT && deltaT <= maxDT) {
+        std::cout << "TLE in the range of acceptable time frame.\n";
+        if (errorMax != 0) {
+            std::cout << "Maximum expected error: " << errorMax << " [km].\n";
+        }
+        std::cout << "Proceeding with the computation...\n";
+        // Running SGP4
+        SGP4Funcs::sgp4(satrec, deltaT, r, v);
+    } else {
+        std::cout << "TLE is optimally valid for this specific target epoch.\n";
+        std::cout << "Proceeding with the computation...\n";
+        SGP4Funcs::sgp4(satrec, deltaT, r, v);
+    }
 
     return {
         {r[0], r[1], r[2]},

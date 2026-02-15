@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(SatelliteTracker 
     src/main.cpp
     src/domain/TimeUtils.cpp
+    src/domain/Tle.cpp
     src/propagation/Sgp4Propagator.cpp
 )
 

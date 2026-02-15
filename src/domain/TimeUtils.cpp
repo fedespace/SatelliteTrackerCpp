@@ -44,7 +44,8 @@ double epoch2MJD2000_TLE(int year, double dayFrac) {
             leapCount++;
         }
     }
-    
+
+    // std::cout << "Year and day: " << year << ", " << dayFrac << std::endl;
     
     int totYears = year - 2000 - 1;
     int totDays = totYears*365 + leapCount;
