@@ -20,22 +20,12 @@ Vector3D rotateZ(const Matrix3x3 R, const Vector3D v){
     };
 }
 
-Radec r2radec(const Vector3D rECEF){
-    // From "Orbital Mechanics" - Curtis, algorithm 4.1
-    // Norm of the vector
-    double norm = rECEF.norm();
-    // Direction cosines
-    double l = rECEF.x/norm;
-    double m = rECEF.y/norm;
-    double n = rECEF.z/norm;
-    // Declination
-    double dec = 1/std::sin(n);
-    // Right Ascension
-    double ra = 1/std::cos(l/std::cos(dec));
-    if (m <= 0) {
-        ra = 360 - ra;
-    };
-    return {ra, dec};
+LL ecef2ll(Vector3D r) {
+    double lon = std::atan(r.y/r.x) * 180 / M_PI; // [deg]
+    if (lon > 180) {
+        lon = 180 - lon;
+    }
+    double lat = std::asin(r.z/r.norm()) * 180 / M_PI; // [deg]
+    
+    return {lat, lon};
 }
-
-
