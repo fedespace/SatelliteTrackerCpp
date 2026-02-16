@@ -111,3 +111,27 @@ OrbitState Sgp4Propagator::propagate(
         targetTime
     };
 }
+
+JD Sgp4Propagator::jday_SGP4(
+    const TimeUTC targetTime
+) {
+    // Initialise the JD and JDfrac
+    double jd;
+    double jdFrac;
+
+    // Compute
+    SGP4Funcs::jday_SGP4(targetTime.year, targetTime.month, targetTime.day, targetTime.hour, targetTime.minute, targetTime.second, jd, jdFrac);
+
+    return {
+        jd, 
+        jdFrac
+    };
+}
+
+double Sgp4Propagator::gstime_SGP4(
+    JD julianDay
+) {
+    double gmst = SGP4Funcs::gstime_SGP4(julianDay.jd);
+    return gmst;
+}
+

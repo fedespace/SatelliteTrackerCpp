@@ -15,6 +15,7 @@ add_executable(SatelliteTracker
     src/domain/TimeUtils.cpp
     src/domain/Tle.cpp
     src/propagation/Sgp4Propagator.cpp
+    src/frames/FrameTransforms.cpp
 )
 
 # Add libraries (Vallado's SGP4 propagator), using 3 steps:
