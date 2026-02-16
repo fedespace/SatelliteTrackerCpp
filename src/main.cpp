@@ -2,6 +2,9 @@
 #include "domain/OrbitState.h"
 #include "frames/Teme2Ecef.h"
 #include "propagation/Sgp4Propagator.h"
+#include "frames/FrameTransforms.h"
+
+// ===============================
 
 int main() {
     
@@ -42,9 +45,22 @@ int main() {
         OrbitState rv = SGP4_TLE.propagate(twoLineElements, target);
         std::cout << "Position vector norm after propagation: " << rv.position_km.norm() << " [km], component x = " << rv.position_km.x <<", y = "<< rv.position_km.y <<", z = "<< rv.position_km.z << std::endl;
 
-        // // Conversion using rotation angle from a reference epoch
-        // //TimeUTC mjd2000{2000,1,1,0,0,0.0};
-        // Vector3D rECEF = TEME2ECEF(rv.position_km, finalEpoch);
+        // targetTime to JD using Vallado's library
+        JD targetJD = SGP4_TLE.jday_SGP4(target);
+
+        // Apply gstime function from Vallado's library to get GMST, used to rotate rv
+        double gmst = SGP4_TLE.gstime_SGP4(targetJD);
+
+        // Rotation from TEME (ECI) to ECEF applying gmstTime (implemented in FrameTransforms.h)
+        Matrix3x3 rotationMatrix = rotationMatrixZ(gmst);
+
+        // Applying the rotation using rotation Matrix with gmst
+        Vector3D rv_ECEF = rotateZ(rotationMatrix, rv.position_km); 
+
+        // Computing now the geodetic points to fetch latitude and longiture
+
+        
+
         // std::cout << "position vector in ECEF: " << rECEF.norm();
         // std::cout << "with components: " << rECEF.x << rECEF.y << rECEF.z;
 

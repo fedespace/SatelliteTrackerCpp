@@ -1,5 +1,7 @@
 #pragma once
 #include "TlePropagator.h"
+#include "../domain/JD.h"
+#include "../../external/sgp4/sgp4.h"
 
 // ===============================
 
@@ -10,4 +12,12 @@ class Sgp4Propagator: public TlePropagator {
             const Tle& tle,
             const TimeUTC& targetTime
         ) const override;
+
+        JD jday_SGP4 (
+            const TimeUTC targetTime
+        );
+
+        double gstime_SGP4 (
+            const JD julianDay
+        );
 };
