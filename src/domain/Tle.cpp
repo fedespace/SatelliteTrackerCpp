@@ -27,8 +27,8 @@ void standardise (Tle& tle) {
 }
 
 // Define type of orbit
-std::string typeOfOrbit(const Tle& tle, double mu) {
-    std::string type;
+OrbitClassif typeOfOrbit(const Tle& tle, double mu) {
+    OrbitClassif type;
     // Fetch mean motion, eccentricity and inclination from TLE elements
     double n_revDay = stod(tle.line2.substr(52,11)); // [rev/day]
     double e = stod(tle.line2.substr(26,7))/10e6;
@@ -38,27 +38,23 @@ std::string typeOfOrbit(const Tle& tle, double mu) {
     double a = cbrt(mu/(n*n));
     double rp = a*(1-e);
     double ra = a*(1+e);
-    // std::string printingValues = "[Mean motion, semi-major axis, eccentricity, inclination]: [" + std::to_string(n) + ", " + std::to_string(a) + ", " + std::to_string(e) + ", " + std::to_string(i) + "\n";
-    // std::cout << printingValues;
     // Decision tree starting from the semi major axis
     if (a < 8300) {
-        type = "LEO";
+        type = OrbitClassif::LEO;
     } else if (a >= 8300 && a < 42164) {
         if (e < 0.5) {
-            type = "MEO";
+            type = OrbitClassif::MEO;
         } else {
             if (ra > 46000) {
-                type = "HEO";
+                type = OrbitClassif::HEO;
             } else {
-                type = "GTO";
+                type = OrbitClassif::GTO;
             }
         }
     }
     else if (a >= 42162 && a < 42167) {
-        type = "GEO";
+        type = OrbitClassif::GEO;
     }
-    else {
-        type = "There might be errors in the computation.";
-    }
+
     return type;
 }

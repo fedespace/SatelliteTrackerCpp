@@ -1,8 +1,9 @@
 #include <iostream>
-#include "domain/OrbitState.h"
+#include "domain/Tle.h"
 #include "frames/Teme2Ecef.h"
 #include "propagation/Sgp4Propagator.h"
 #include "frames/FrameTransforms.h"
+#include <iomanip>
 
 // ===============================
 
@@ -74,6 +75,37 @@ int main() {
         double lat = ll.lat;
         double lon = ll.lon;
         std::cout << "Lon, lat [deg]: {" << lon << ", " << lat << "}\n";
+
+        // Setting the step interval for plotting the groundtrack
+        OrbitClassif classification = rv.classification;
+        double gStep;
+        if (!gStep) {
+            if (classification == OrbitClassif::LEO) {
+                gStep = 10; // [s]
+            } else if (classification == OrbitClassif::MEO) {
+                gStep = 30; // [s]
+            } else if (classification == OrbitClassif::GTO || classification == OrbitClassif::HEO) {
+                gStep = 60; // [s]
+            } else {
+                gStep = 300; // [s]
+            }
+        }
+
+        // Defining max epochTime from TLE allowed to have validity of the gt
+        int maxTargetVal = rv.validityTle;
+        int endGT; 
+        if (!endGT) {
+            endGT = maxTargetVal;
+        }
+
+        // TEST MJD and TimeUTC
+        TimeUTC timestart = {2026, 2, 18, 10, 36, 22.0};
+        std::cout << "Time start: " << timestart.day << " " << timestart.month << " " << timestart.year << " " << timestart.hour << " " << timestart.minute << " " << timestart.second << "\n";
+        double mjd_timestart = epoch2MJD2000(timestart);
+        std::cout << "mjd of timestart: " << std::setprecision(10) << mjd_timestart << "\n";
+        TimeUTC convertedBack = MJD20002epoch(14814720);
+        std::cout << convertedBack.year << " " << convertedBack.month << " " << convertedBack.day << " " << convertedBack.hour << " " << convertedBack.minute << " " << convertedBack.second << std::endl;
+        
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what();

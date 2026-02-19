@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "OrbitState.h"
 
 // ===============================
 
@@ -13,4 +14,4 @@ void validate(Tle& tle);
 
 void standardise (Tle& tle);
 
-std::string typeOfOrbit(const Tle& tle, double mu);
+OrbitClassif typeOfOrbit(const Tle& tle, double mu);

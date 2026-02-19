@@ -1,7 +1,6 @@
 #pragma once
 #include <cmath>
 #include "../domain/Vector3D.h"
-#include "../domain/Radec.h"
 #include <iostream>
 #include "../domain/LL.h"
 
