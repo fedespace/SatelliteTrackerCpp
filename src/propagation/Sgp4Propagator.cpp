@@ -12,7 +12,7 @@
 //      - tle [Tle]
 //      - targetTime [TimeUTC]
 //    Outputs:
-//      - {position, velocity, targetTime} [OrbitState]
+//      - {position, velocity, targetTime, classification} [OrbitState]
 
 OrbitState Sgp4Propagator::propagate(
     const Tle& tle,
@@ -55,29 +55,27 @@ OrbitState Sgp4Propagator::propagate(
 
     // Given the type or orbit, check maxDT, idealDT and errorMax
     double mu = satrec.mus;
-    std::string type = typeOfOrbit(tle, mu);
+    OrbitClassif type = typeOfOrbit(tle, mu);
     int maxDT;
     int idealDT;
     int errorMax;
-    if (type == "LEO") {
+    if (type == OrbitClassif::LEO) {
         idealDT = 1440; // 1 day
         maxDT = 1440 * 3; // 3 days
         errorMax = 10; // [km]
-    } else if (type == "MEO") {
+    } else if (type == OrbitClassif::MEO) {
         maxDT = 1440 * 3; // 3 days
         idealDT = maxDT;
         errorMax = 20;
-    } else if (type == "GTO" || type == "HEO") {
+    } else if (type == OrbitClassif::GTO || type == OrbitClassif::HEO) {
         maxDT = 1440 * 2; // 2 days
         idealDT = maxDT;
         errorMax = 0; // info unavailable
-    } else if (type == "GEO") {
+    } else if (type == OrbitClassif::GEO) {
         maxDT = 1440 * 15; // 2 weeks
         idealDT = maxDT;
         errorMax = 0; // info unavailable
     }
-
-    std::cout << "Type of orbit: " << type << std::endl;
 
     // Computing deltaT between TLE and finalEpoch
     double deltaT = minutesSinceEpochTarget - minutesSinceEpochTLE;
@@ -108,7 +106,9 @@ OrbitState Sgp4Propagator::propagate(
     return {
         {r[0], r[1], r[2]},
         {v[0], v[1], v[2]},
-        targetTime
+        targetTime,
+        type,
+        maxDT
     };
 }
 

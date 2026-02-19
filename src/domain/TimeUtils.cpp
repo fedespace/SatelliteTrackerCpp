@@ -2,6 +2,7 @@
 #include "TimeUTC.h"
 #include <stdexcept>
 #include <iostream>
+#include <iomanip>
 
 // ===============================
 
@@ -44,10 +45,8 @@ double epoch2MJD2000_TLE(int year, double dayFrac) {
             leapCount++;
         }
     }
-
-    // std::cout << "Year and day: " << year << ", " << dayFrac << std::endl;
     
-    int totYears = year - 2000 - 1;
+    int totYears = year - 2000;
     int totDays = totYears*365 + leapCount;
 
     // Considering now the day fraction of the TLE and summing together
@@ -61,14 +60,14 @@ double epoch2MJD2000_TLE(int year, double dayFrac) {
 
 // ===============================
 
-double epoch2MJD2000(const TimeUTC& targetTime) {
+double epoch2MJD2000(const TimeUTC& timestart) {
 
-    int year = targetTime.year;
-    int month = targetTime.month;
-    int day = targetTime.day;
-    int hour = targetTime.hour;
-    int minute = targetTime.minute;
-    int second = targetTime.second;
+    int year = timestart.year;
+    int month = timestart.month;
+    int day = timestart.day;
+    int hour = timestart.hour;
+    int minute = timestart.minute;
+    double second = timestart.second;
 
     // Calculating amount of leap years between target year since 2000
     int leapCount = 0;
@@ -78,60 +77,71 @@ double epoch2MJD2000(const TimeUTC& targetTime) {
         }
     }
  
-    int totDays_yearminus1 = (year - 1 - 2000) * 365 + leapCount;
+    // Number of minutes from 1st Jan 2000 to start of the current year (2000-year)
+    int mjd2000_startYear = (year - 2000) * 365 * 1440 + leapCount * 1440;
 
-    int d;
-    int validMonth = month - 1;
-    switch (validMonth) {
-    case 0: // December previous year, doesn't count
-        d = 0;
-    case 1:
-        d = 31;
-        break;
-    case 2:
-        d = 31 + 28;
-        break;
-    case 3:
-        d = 31 + 28 + 31;
-        break;
-    case 4:
-        d = 31 + 28 + 31 + 30;
-        break;
-    case 5:
-        d = 31 + 28 + 31 + 30 + 31;
-        break;
-    case 6:
-        d = 31 + 28 + 31 + 30 + 31 + 30;
-        break;
-    case 7:
-        d = 31 + 28 + 31 + 30 + 31 + 30 + 31;
-        break;
-    case 8:
-        d = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31;
-        break;
-    case 9:
-        d = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30;
-        break;
-    case 10:
-        d = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31;
-        break;
-    case 11:
-        d = 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30;
-        break;
-    default:
-        throw std::invalid_argument("Invalid month: value should be between 1 and 12.");
-        break;
+    // Defining the days in a month
+    std::vector<int> dayInAMonth = {30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // Jan has 30 days because index starts from 0, hence day 31 is equal to day 30
+    // if current year is a leap one, then change the Feb one to 29
+    if (leapYear(year)) {
+        dayInAMonth[1] = 29;
     }
 
-    bool currentYear_leap = leapYear(year);
-    if (currentYear_leap && month > 2) {
-        d = d+1;
+    // Computing the fraction of the day of the year
+    int wholeDays = 0;
+    for (int m = 0; m < (month - 1); m++) { // means Jan == 0, Feb == 1, consistent with index
+        wholeDays = wholeDays + dayInAMonth[m]; 
+    }
+    double dayF = wholeDays + day + double(hour)/24.0 + double(minute)/1440.0 + second/86400.0;
+
+    // Converting it to mins
+    double minF = dayF * 1440;
+
+    double mjd2000 = minF + mjd2000_startYear;
+
+
+    return mjd2000;
+}
+
+TimeUTC MJD20002epoch(double mjd_date) {
+
+    double mjd_stdYear = 365*1440; // [min]
+    double fraction = mjd_date / mjd_stdYear;
+    int guess0 = int(fraction) + 2000;
+
+    int leapCount = 0;
+    for (int y = 2000; y < guess0; y++) {
+        if (leapYear(y)){
+            leapCount++;
+        }
     }
 
-    int totDays = totDays_yearminus1 + day + d;
+    double mjd_tillYear = mjd_stdYear*(guess0 - 2000) + leapCount*1440;
 
-    // Calculating the minutes:
-    double target_Min = totDays*24*60 + hour*60 + minute + second/60;
+    double remainingOfYear = mjd_date - mjd_tillYear;
+    double dayF = remainingOfYear/1440;
 
-    return target_Min;
-};
+    // Defining the days in a month
+    std::vector<int> dayInAMonth = {30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // Jan has 30 days because index starts from 0, hence day 31 is equal to day 30
+    // if current year is a leap one, then change the Feb one to 29
+    if (leapYear(guess0)) {
+        dayInAMonth[1] = 29;
+    }
+
+    // Computing the fraction of the day of the year
+    int index = 0;
+    while (int(dayF) > dayInAMonth[index]) {
+        dayF = dayF - dayInAMonth[index];
+        index++;
+    }
+    int month = index + 1;
+
+    int dd = int(dayF);
+    double spareSecs = (dayF - dd) * 86400;
+    double hhF = spareSecs / 3600;
+    int hh = int(hhF);
+    double mmF = (hhF - hh) * 60;
+    int mm = int(mmF);
+    double ss = (mmF - mm) * 60;
+
+    return {guess0, month, dd, hh, mm, ss};
