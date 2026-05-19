@@ -2,14 +2,18 @@
 #include "TimeUTC.h"
 #include <stdexcept>
 #include <vector>
+#include "Tle.h"
 
 // ===============================
 
+// JD of TLE epoch [days, double]
+double jd(Tle tle);
+
 // TLE epoch conversion to MJD2000 [min]
-double epoch2MJD2000_TLE(int year, double dayFrac);
+double epoch2MJD2000_TLE(Tle tle);
 
 // targetEpoch conversion to MJD2000 [min]
-double epoch2MJD2000(const TimeUTC& targetTime);
+double epoch2mins(const TimeUTC& targetTime);
 
 // Leap year boolean
 bool leapYear(int year);
