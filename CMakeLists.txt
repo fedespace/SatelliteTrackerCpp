@@ -8,18 +8,18 @@ project(SatelliteTracker LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -g")
+
+find_package(ROOT REQUIRED COMPONENTS Graf Core RIO Hist Gpad)
 
 # Add the executable files (list will build up)
 add_executable(SatelliteTracker 
     src/main.cpp
     src/domain/TimeUtils.cpp
     src/domain/Tle.cpp
-    src/propagation/Sgp4Propagator.cpp
     src/frames/FrameTransforms.cpp
+    src/domain/GroundTrack.cpp
+    src/domain/Plot2D.cpp
 )
-
-# Add libraries (Vallado's SGP4 propagator), using 3 steps:
 
 # SGP4 is its own library
 add_library(sgp4
@@ -33,3 +33,14 @@ set_source_files_properties(
 # The app is linked to it
 target_include_directories(sgp4 PUBLIC external/sgp4)
 target_link_libraries(SatelliteTracker PRIVATE sgp4)
+
+# For ROOT library (developed by CERN)
+target_include_directories(SatelliteTracker PRIVATE src)
+target_link_libraries(SatelliteTracker
+    PRIVATE
+        ROOT::Graf
+        ROOT::Core
+        ROOT::RIO
+        ROOT::Hist
+        ROOT::Gpad
+)

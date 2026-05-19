@@ -13,31 +13,88 @@ bool leapYear(int year) {
 
 
 void validate(const TimeUTC& time) {
-    // month validation
-        if (time.month < 1 || time.month > 12) 
-            throw std::invalid_argument("Invalid month.");
-        // all the cases for the days of the different months
-        if (time.day < 1 || (time.day > 31 && (time.month == 1 || time.month == 3 || time.month == 5 || time.month == 7 || time.month == 8 || time.month == 10 || time.month == 12)))
-            throw std::invalid_argument("Invalid day.");
-        if (time.day < 1 || (time.day > 30 && (time.month == 2 || time.month == 4 || time.month == 6 || time.month == 9 || time.month == 11)))
-            throw std::invalid_argument("Invalid day.");
-        bool isLeap = leapYear(time.year);
-        if (time.day < 1 || (time.month == 2 && (time.day > 28 && !isLeap)) || (time.month == 2 && (time.day > 29 && isLeap)))
-            throw std::invalid_argument("Invalid day.");
-        // hour validation
-        if (time.hour < 0 || time.hour > 24)
-            throw std::invalid_argument("Invalid hour.");
-        // minute validation
-        if (time.minute < 0 || time.minute > 60)
-            throw std::invalid_argument("Invalid minute.");
-        // second validation
-        if (time.second < 0.0 || time.second > 59.0)
-            throw std::invalid_argument("Invalid second.");
+    // Month validation
+    if (time.month < 1 || time.month > 12) // 0 or 13
+        throw std::invalid_argument("Invalid month.");
+    // Days validation - general
+    if (time.day < 1 || time.day > 31) {
+        throw std::invalid_argument("Invalid day.");
+    }
+    // Days validation - 30 days months or 28/29 days month
+    bool isLeap = leapYear(time.year);
+    switch (time.month) {
+        case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+            if (time.day < 1 || time.day > 31) {
+                throw std::invalid_argument("Invalid day.");
+            }
+            break;
+        case 4: case 6: case 9: case 11:
+            if (time.day < 1 || time.day > 30) {
+                throw std::invalid_argument("Invalid day.");
+            }
+            break;
+        case 2:
+            if (isLeap) {
+                if (time.day < 1 || time.day > 29) {
+                    throw std::invalid_argument("Invalid day.");
+                }
+            } else {
+                if (time.day < 1 || time.day > 28) {
+                    throw std::invalid_argument("Invalid day.");
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    // Hour validation
+    if (time.hour < 0 || time.hour > 23) // -1 or 24 (should be next day in that case)
+        throw std::invalid_argument("Invalid hour.");
+    // Minute validation 
+    if (time.minute < 0 || time.minute > 59) // -1 or 60 (should be next hour in that case)
+        throw std::invalid_argument("Invalid minute.");
+    // second validation
+    if (time.second < 0.0 || time.second > 59.0) // -1 or 60.0 (should be next minute in that case)
+        throw std::invalid_argument("Invalid second.");
 }
 
 // ===============================
 
-double epoch2MJD2000_TLE(int year, double dayFrac) {
+// === VALIDATED =================
+double jd(Tle tle){
+    // Definition from Vallado's sgp4init: days from 1st Jan 1950 00:00:00
+
+    int year2digits = std::stoi(tle.line1.substr(18,2));
+    int year;
+    if (year2digits >= 57) {
+        year = 1900 + year2digits;
+    } else {
+        year = 2000 + year2digits;
+    }
+    double dayOfYear = std::stod(tle.line1.substr(20,12));
+
+    // Computing amount of lead years
+    int leapDays = 0;
+    for (int i = 1950; i < year; i++) { 
+        if (leapYear(i)) {
+            leapDays++;
+        }
+    }
+
+    // Compute days and fraction of days
+    double jd; // [days]
+    jd = (year - 1950) * 365.0 + dayOfYear + leapDays - 1.0; // start counting from 0 on 1st Jan, not 1
+
+    return jd; // [days]
+}
+
+// ===============================
+
+double epoch2MJD2000_TLE(Tle tle) {
+    // Fetch year and doy from tle object
+    int year = std::stoi(tle.line1.substr(18,2)) + 2000; // after year 2000
+    double dayOfYear = std::stod(tle.line1.substr(20,12));
+
     // Calculating amount of leap years between target year since 2000
     int leapCount = 0;
     for (int y = 2000; y < year; y++) {
@@ -50,17 +107,18 @@ double epoch2MJD2000_TLE(int year, double dayFrac) {
     int totDays = totYears*365 + leapCount;
 
     // Considering now the day fraction of the TLE and summing together
-    double TLE_Days = totYears*365 + leapCount + dayFrac;
+    double TLE_Days = totYears*365 + leapCount + dayOfYear - 1.0; // the year start with 1st Jan but the count start from 0.0
 
     // Converting to minutes
-    double TLE_Minutes = TLE_Days * 60 * 24;
+    double TLE_Minutes = double(TLE_Days) * 1440.0;
 
     return TLE_Minutes;
 };
 
 // ===============================
 
-double epoch2MJD2000(const TimeUTC& timestart) {
+// === VALIDATED =================
+double epoch2mins(const TimeUTC& timestart) {
 
     int year = timestart.year;
     int month = timestart.month;
@@ -69,44 +127,40 @@ double epoch2MJD2000(const TimeUTC& timestart) {
     int minute = timestart.minute;
     double second = timestart.second;
 
-    // Calculating amount of leap years between target year since 2000
-    int leapCount = 0;
-    for (int y = 2000; y < year; y++) {
-        if (leapYear(y)){
-            leapCount++;
+    // Computing amount of lead years
+    int leapDays = 0;
+    for (int i = 2000; i < year; i++) { 
+        if (leapYear(i)) {
+            leapDays++;
         }
     }
- 
-    // Number of minutes from 1st Jan 2000 to start of the current year (2000-year)
-    int mjd2000_startYear = (year - 2000) * 365 * 1440 + leapCount * 1440;
 
-    // Defining the days in a month
-    std::vector<int> dayInAMonth = {30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // Jan has 30 days because index starts from 0, hence day 31 is equal to day 30
-    // if current year is a leap one, then change the Feb one to 29
-    if (leapYear(year)) {
-        dayInAMonth[1] = 29;
+    // Number of days from 01/01/2000 till start or year
+    int nDays = (year - 2000) * 365 + leapDays;
+
+    // Defining the vector of days per month (Jan has 30 because we start counting from 0)
+    std::vector<int> dayInAMonth = {30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (leapYear(year)) {dayInAMonth[1] = 29;}
+
+    // Number of days till (month-1)
+    int previousMonth = month - 1;
+    int daysTillMonth = 0;
+    for (int i = 0; i < previousMonth; i++) {
+        daysTillMonth += dayInAMonth[i];
     }
 
-    // Computing the fraction of the day of the year
-    int wholeDays = 0;
-    for (int m = 0; m < (month - 1); m++) { // means Jan == 0, Feb == 1, consistent with index
-        wholeDays = wholeDays + dayInAMonth[m]; 
-    }
-    double dayF = wholeDays + day + double(hour)/24.0 + double(minute)/1440.0 + second/86400.0;
+    // Total days
+    double D = nDays + daysTillMonth + day + hour/24.0 + minute/1440.0 + second/86400.0;
 
-    // Converting it to mins
-    double minF = dayF * 1440;
-
-    double mjd2000 = minF + mjd2000_startYear;
-
-
-    return mjd2000;
+    // Total minutes
+    double M = D * 1440.0;
+    return M;
 }
 
 TimeUTC MJD20002epoch(double mjd_date) {
 
-    double mjd_stdYear = 365*1440; // [min]
-    double fraction = mjd_date / mjd_stdYear;
+    int min_nonLeap = 365 * 1440; // [min]
+    double fraction = mjd_date / min_nonLeap;
     int guess0 = int(fraction) + 2000;
 
     int leapCount = 0;
@@ -116,32 +170,46 @@ TimeUTC MJD20002epoch(double mjd_date) {
         }
     }
 
-    double mjd_tillYear = mjd_stdYear*(guess0 - 2000) + leapCount*1440;
+    double min_g0 =((guess0 - 2000) * 365.0 + leapCount - 1.0) * 1440.0;
 
-    double remainingOfYear = mjd_date - mjd_tillYear;
-    double dayF = remainingOfYear/1440;
-
-    // Defining the days in a month
-    std::vector<int> dayInAMonth = {30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // Jan has 30 days because index starts from 0, hence day 31 is equal to day 30
-    // if current year is a leap one, then change the Feb one to 29
-    if (leapYear(guess0)) {
-        dayInAMonth[1] = 29;
+    int year;
+    if (min_g0 <= mjd_date) {
+        year = guess0;
+    } else {
+        year = guess0 - 1;
+        min_g0 =((year - 2000) * 365.0 + leapCount - 1.0) * 1440.0;
     }
+
+    double rem = mjd_date - min_g0;
+
+    double dayFrac = rem / 1440.0;
+    int day = int(dayFrac);
+
+    // Defining the vector of days per month
+    std::vector<int> dayInAMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (leapYear(year)) {dayInAMonth[1] = 29;}
 
     // Computing the fraction of the day of the year
     int index = 0;
-    while (int(dayF) > dayInAMonth[index]) {
-        dayF = dayF - dayInAMonth[index];
+    while (day > dayInAMonth[index]) {
+        day = day - dayInAMonth[index];
         index++;
     }
     int month = index + 1;
+    
+    // Days till month
+    int totDays = 0;
+    for (int i = 0; i < index; i++) {
+        totDays += dayInAMonth[i];
+    }
 
-    int dd = int(dayF);
-    double spareSecs = (dayF - dd) * 86400;
-    double hhF = spareSecs / 3600;
-    int hh = int(hhF);
-    double mmF = (hhF - hh) * 60;
-    int mm = int(mmF);
-    double ss = (mmF - mm) * 60;
+    float remS = (dayFrac - int(dayFrac)) * 86400.0; // [sec]
+    float hourFrac = remS / 3600.0;
+    int hour = hourFrac;
+    
+    remS -= hour * 3600.0;
+    int minute = remS / 60.0;
+    double seconds = remS - minute * 60.0;
 
-    return {guess0, month, dd, hh, mm, ss};
+    return {year, month, day, hour, minute, seconds};
+}

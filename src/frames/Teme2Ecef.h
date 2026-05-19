@@ -11,7 +11,7 @@ inline Vector3D TEME2ECEF(
     const TimeUTC t
 ) {
     // Compute using the function about MJD2000
-    double minSinceMJD = epoch2MJD2000(t);
+    double minSinceMJD = epoch2mins(t);
     double dt = minSinceMJD*60;
     double theta = EARTH_ROT_RATE_RAD_S * dt;
     // Minus, because we are not rotating the satellite but the coordinate frames which is equal to rotate the Earth eastwards.

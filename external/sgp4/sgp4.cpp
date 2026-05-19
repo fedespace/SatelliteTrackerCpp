@@ -59,11 +59,9 @@
 *                           original baseline
 *       ----------------------------------------------------------------      */
 
-#include "sgp4.h"
+#include "SGP4.h"
 
 #include <string>
-#include <cstdlib> 
-// NB: last include added by Federica Lombardo, as this code needs an int for satnum while it gets a string. Will modify line 2253 of this code.
 
 #define pi 3.14159265358979323846
 
@@ -2250,7 +2248,7 @@ namespace SGP4Funcs
 
 		int strIndex, index;
 		if (isdigit(satrec.satnumStr[0]))
-			satrec.satnum = std::atoi(satrec.satnumStr);
+			satrec.satnum = std::stoi(satrec.satnumStr);
 		else
 		{
 			int alpha5[] = {10, 11, 12, 13, 14, 15, 16, 17, 0, 18, 19, 20, 21, 22, 0, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33};
@@ -2505,7 +2503,7 @@ namespace SGP4Funcs
 
 		tut1 = (jdut1 - 2451545.0) / 36525.0;
 		temp = -6.2e-6* tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 +
-			(876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841;  // sec
+			(876600.0 * 3600.0 + 8640184.812866) * tut1 + 67310.54841;  // sec
 		temp = fmod(temp * deg2rad / 240.0, twopi); //360/86400 = 1/240, to deg, to rad
 
 		// ------------------------ check quadrants ---------------------

@@ -21,4 +21,4 @@ Matrix3x3 rotationMatrixZ(double angle);
 // Performing the matrix-vector product
 Vector3D rotateZ(const Matrix3x3 R, const Vector3D v);
 
-LL ecef2ll(Vector3D r);
+void ecef2ll(Vector3D r, double rE, double& lat, double& lon);
