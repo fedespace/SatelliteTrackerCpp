@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  GS.swift
 //  SatelliteTracker
 //
 //  Created by Federica Lombardo on 20/05/2026.
@@ -7,12 +7,8 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct GS: View {
     var body: some View {
-        TabBar()
+        Text("GroundStation")
     }
-}
-
-#Preview {
-    ContentView()
 }
