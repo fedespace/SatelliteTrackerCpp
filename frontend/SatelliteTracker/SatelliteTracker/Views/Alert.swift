@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  Alert.swift
 //  SatelliteTracker
 //
 //  Created by Federica Lombardo on 20/05/2026.
@@ -7,12 +7,8 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct Alert: View {
     var body: some View {
-        TabBar()
+        Text("Alerts")
     }
-}
-
-#Preview {
-    ContentView()
 }
