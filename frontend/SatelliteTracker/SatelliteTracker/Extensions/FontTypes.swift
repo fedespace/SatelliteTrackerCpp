@@ -8,11 +8,15 @@
 import SwiftUI
 
 extension Font {
+    
+    // Eunomia fonts
     static let eunomiaLight = Font.custom("Eunomia-Light", size: 24)
     static let eunomiaRegular = Font.custom("Eunomia-Regular", size: 24)
     static let eunomiaBold = Font.custom("Eunomia-Bold", size: 24)
     
+    // Main title of the page
     static let mainTitleFont = Font.custom("Eunomia-Bold", size: 52)
     
-    static let inputPickerFont = Font.custom("Playfair", size: 15)
+    // Custom input picker
+    static let inputPickerFont = Font.custom("Electrolize", size: 15)
 }

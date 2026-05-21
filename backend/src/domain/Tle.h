@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "OrbitState.h"
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -39,4 +38,4 @@ void standardise (Tle& tle);
 
 TleParam parseTLE(Tle tle);
 
-OrbitClassif typeOfOrbit(const Tle& tle, double mu);
+// OrbitClassif typeOfOrbit(const Tle& tle, double mu);

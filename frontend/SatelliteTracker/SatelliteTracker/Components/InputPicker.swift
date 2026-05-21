@@ -23,10 +23,10 @@ struct InputPicker: View {
         
         HStack {
             ForEach(InputOptions.allCases, id: \.self) { option in
-                Text(option.rawValue.capitalized)
-                    .padding(10)
+                Text(option.rawValue.uppercased())
+                    .padding(5)
                     .background(
-                        inputType == option ? Color.gray.opacity(0.5) : nil
+                        inputType == option ? Color.gray.opacity(0.7) : nil
                     )
                     .animation(.easeInOut(duration: 0.3), value: inputType)
                     .foregroundStyle(
@@ -42,9 +42,9 @@ struct InputPicker: View {
                 
             }
         }
+        .frame(maxWidth: .infinity)
         .padding([.top, .bottom], 5)
-        .padding([.leading, .trailing], 15)
-        .background(Color.gray.opacity(0.05))
+        .background(Color.gray.opacity(0.15))
         .clipShape(.capsule)
     }
 }
