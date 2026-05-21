@@ -2,8 +2,6 @@
 #include <cmath>
 #include "../domain/Vector3D.h"
 #include <iostream>
-#include "../domain/LL.h"
-
 
 // ===============================
 

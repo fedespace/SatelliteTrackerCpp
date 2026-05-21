@@ -1,6 +1,5 @@
 // ===============================
 
-// Process each import just once per compilation, avoiding dangerous redefinition (i.e. Vector3D.h could also be included in another .h file and if we import both there would be a problem)
 #pragma once
 #include <cmath> // Used for basic math functions as sqrt
 

@@ -17,8 +17,7 @@ add_executable(SatelliteTracker
     src/domain/TimeUtils.cpp
     src/domain/Tle.cpp
     src/frames/FrameTransforms.cpp
-    src/domain/GroundTrack.cpp
-    src/domain/Plot2D.cpp
+    src/domain/sgp4Propagator.cpp
 )
 
 # SGP4 is its own library
