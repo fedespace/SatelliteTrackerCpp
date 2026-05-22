@@ -23,3 +23,6 @@ void validate(const TimeUTC& time);
 
 // MJD2000 to targetEpoch conversion
 TimeUTC MJD20002epoch(double mjd_date);
+
+// Conversion from TimeUTC to String
+std::string to_iso8601(TimeUTC time);

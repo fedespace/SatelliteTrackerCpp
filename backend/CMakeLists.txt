@@ -11,9 +11,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ROOT REQUIRED COMPONENTS Graf Core RIO Hist Gpad)
 
-# Add the executable files (list will build up)
+# These are files called by the executable with this name. More executables can be created with different names and called.
 add_executable(SatelliteTracker 
-    src/main.cpp
+    # src/main.cpp - removing this for now as everything is in server.cpp
+    src/server.cpp
     src/domain/TimeUtils.cpp
     src/domain/Tle.cpp
     src/frames/FrameTransforms.cpp
