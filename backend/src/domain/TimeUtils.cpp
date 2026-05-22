@@ -213,3 +213,12 @@ TimeUTC MJD20002epoch(double mjd_date) {
 
     return {year, month, day, hour, minute, seconds};
 }
+
+// Conversion from TimeUTC to String
+std::string to_iso8601(TimeUTC time) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf),
+        "%04d-%02d-%02dT%02d:%02d:%06.3fZ",
+        time.year, time.month, time.day, time.hour, time.minute, time.second);
+    return buf;
+}
