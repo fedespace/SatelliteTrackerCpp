@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 // Homepage structure
 struct Homepage: View {
@@ -34,8 +35,6 @@ struct Homepage: View {
                 // HSTACK with textfield & confirm arrow
                 HStack {
                     TextField(String("Search by \(inputType.rawValue.uppercased())..."), text: $searchItem)
-                    
-                    let _ = print("view loaded")
 
                     Button("", systemImage: "arrow.right") {
                         // Call the function to get the groundtrack data
@@ -51,15 +50,33 @@ struct Homepage: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 7)
+                
             }
-            Spacer()
             
-            Text("Other content")
+            // View of the 2D Map
+            Map(
+                initialPosition: .region(MKCoordinateRegion(
+                    center:
+                    CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                    span:
+                    MKCoordinateSpan(latitudeDelta: 180, longitudeDelta: 360
+                                    )
+                 ))) {
+                     
+                     // Lineplot
+                     MapPolyline(coordinates: gtViewModel.coordinates)
+                         .stroke(Color.red, lineWidth: 2)
+                
+            }
+                 //.frame(height: 350)
+            
             
         }
         .padding(.top, 60)
         .padding([.leading, .trailing], 30)
         .ignoresSafeArea()
+        
+        Spacer()
     }
 }
    
