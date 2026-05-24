@@ -12,7 +12,7 @@ struct GroundTrackService {
     func fetchGroundTrack(tle: TleRequest) async throws -> [String: GroundTrackPoint] {
         
         // Request:
-        var request = URLRequest(url: URL(string: "http://localhost:8080/groundtrack")!)
+        var request = URLRequest(url: URL(string: "http://192.168.0.19:8080/groundtrack")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(tle) // from swift to JSON and then to server
