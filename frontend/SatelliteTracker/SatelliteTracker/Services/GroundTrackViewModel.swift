@@ -19,10 +19,11 @@ class GroundTrackViewModel {
               .map { CLLocationCoordinate2D(latitude: $0.value.lat, longitude: $0.value.lon) }
     }
     
-    func fetchGroundTrack(tle: TleRequest) async {
+    func fetchGroundTrack(inputType: InputOptions, searchItem: String, start: Date, end: Date) async {
         isLoading = true
         do {
-            points = try await GroundTrackService().fetchGroundTrack(tle: tle)
+            points = try await GroundTrackService().fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: start, end: end)
+            print(points)
         } catch {
             errorMessage = error.localizedDescription
         }
