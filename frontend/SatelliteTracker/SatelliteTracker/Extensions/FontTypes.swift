@@ -19,4 +19,8 @@ extension Font {
     
     // Custom input picker
     static let inputPickerFont = Font.custom("Electrolize", size: 15)
+    
+    // Step / groundtrack buttons
+    static let inputButtonsFont = Font.custom("Electrolize", size: 15)
+
 }

@@ -14,7 +14,13 @@ struct GroundTrackPoint: Codable {
 }
 
 struct TleRequest: Codable {
+    var name: String = ""
+    var line1: String = ""
+    var line2: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+}
+
+struct NameRequest: Codable {
     let name: String
-    let line1: String
-    let line2: String
 }
