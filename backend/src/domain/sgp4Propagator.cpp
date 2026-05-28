@@ -26,26 +26,31 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
             satrec
         );
 
-        // Conversion of timeUTC to "time since epoch (minutes)"
+        // Conversion of timeUTC to "time since TLE epoch (minutes)"
+        double time_TLE_min = epoch2MJD2000_TLE(tle);
         double timeS_min = epoch2mins(start);
         double timeE_min = epoch2mins(end);
-        double deltaT = timeE_min - timeS_min;
-
-        // While loop for the propagation and grountrack
-        double tsince = step; // in the first iteration that's equal to the step
-        double r[3], v[3];
-        double jd, jdfrac;
-        double t = timeS_min; // the time that will keep incrementing in the groundtrack loop
+        double tsince = timeS_min - time_TLE_min; // start value of the tsince
         double radius_earth = satrec.radiusearthkm;
         double lat, lon;
         std::vector<double> lat_vec, lon_vec;
         std::vector<GroundTrack> gt;
+
+        double deltaT = timeE_min - timeS_min; // da cancellare?
+
+        // Initialise variables
+        double r[3], v[3];
+        double jd, jdfrac;
+
+       //  double t = timeS_min; // the time that will keep incrementing in the groundtrack loop
+
+        // While loop for the propagation and grountrack
         while (tsince <= deltaT) {
             SGP4Funcs::sgp4(satrec, tsince, r, v);
-            double t1 = t + step; // [min]
-            TimeUTC t1_components = MJD20002epoch(t1); // [year, month, day, hour, minute, seconds]
+            double time = time_TLE_min + tsince; // [min]
+            TimeUTC time_c = MJD20002epoch(time); // [year, month, day, hour, minute, seconds]
             SGP4Funcs::jday_SGP4(
-                t1_components.year, t1_components.month, t1_components.day, t1_components.hour, t1_components.minute, t1_components.second,
+                time_c.year, time_c.month, time_c.day, time_c.hour, time_c.minute, time_c.second,
                 jd, jdfrac
             );
             double jd_full = jd + jdfrac;
@@ -56,13 +61,11 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
             ecef2ll(r_ecef, radius_earth, lat, lon);
             lat_vec.push_back(lat);
             lon_vec.push_back(lon);
-            GroundTrack single_point = {t1_components, lat, lon};
+            GroundTrack single_point = {time_c, lat, lon};
             gt.push_back(single_point);
             
-            // Update t for next iteration
-            t += step; 
-            tsince += step;
-
+            // Update for the next iteration
+            tsince += step; // [min]
         }
 
         return gt;

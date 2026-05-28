@@ -13,7 +13,7 @@ enum GroundTrackError: Error {
 
 struct GroundTrackService {
     
-    func fetchGroundTrack(inputType: InputOptions, searchItem: String, start: Date, end: Date) async throws -> [String: GroundTrackPoint] {
+    func fetchGroundTrack(inputType: InputOptions, searchItem: String, start: Date, end: Date, step: String) async throws -> [String: GroundTrackPoint] {
         
         // Initialise the TLE structure and formatter for dates
         var tle = TleRequest()
@@ -28,6 +28,7 @@ struct GroundTrackService {
             tle.name = String(searchItem.dropLast(139)).trimmingCharacters(in: .whitespaces)
             tle.startTime = formatter.string(from: start)
             tle.endTime = formatter.string(from: end)
+            tle.stepInterval = step
             print(tle)
             // Request
             var request = URLRequest(url: URL(string: "http://172.20.10.13:8080/groundtrack/tle")!)
@@ -42,10 +43,10 @@ struct GroundTrackService {
             // Parse the Name object (if spaces are present)
             let parsedName = searchItem.replacingOccurrences(of: " ", with: "+")
             // Request
-            var request = URLRequest(url: URL(string: "http://192.168.0.19:8080/groundtrack/name")!)
+            var request = URLRequest(url: URL(string: "http://172.20.10.13:8080/groundtrack/name")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            // Converting input (TLE) to JSON for the server
+            // Converting input (name) to JSON for the server
             request.httpBody = try JSONEncoder().encode(parsedName) // from swift to JSON and then to server
             let (data, _) = try await URLSession.shared.data(for:request)
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
