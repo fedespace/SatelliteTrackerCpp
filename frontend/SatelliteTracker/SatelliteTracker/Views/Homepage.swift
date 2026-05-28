@@ -117,7 +117,7 @@ struct Homepage: View {
                     Button("", systemImage: "arrow.right") {
                         // Call the function to get the groundtrack data
                         Task {
-                            await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime)
+                            await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                         }
                     }
                     .tint(Color.burntSienna)
@@ -128,13 +128,21 @@ struct Homepage: View {
             }
             
             // View of the 2D Map
-            Map (initialPosition: mapCamera) {//.region(mapRegion)) {
+            Map (initialPosition: mapCamera) {
                 MapPolyline(coordinates: gtViewModel.coordinates)
-                    .stroke(Color.red, lineWidth: 2)
+                    .stroke(Color.darkSlateGrey, lineWidth: 2)
+                
+                ForEach(gtViewModel.coordinates, id: \.latitude) { point in
+                    let c = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
+                    Annotation("", coordinate: c) {
+                        Circle().fill(Color.burntSienna)
+                            .frame(width: 5, height: 5)
+                    }
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: 200)
+            .frame(maxWidth: .infinity, maxHeight: 350)
             .mapStyle(.standard(elevation: .flat))
-            
+                
     
                 
                 

@@ -41,8 +41,16 @@ int main() {
         end.minute = std::stoi(endString.substr(14,2));
         end.second = std::stod(endString.substr(17,2));
 
+        // Get the step from the user (if any)
+        std::string stepString = body["stepInterval"].get<std::string>();
+        double step;
+        if (stepString != "") {
+            step = std::stod(stepString);
+        } else {
+            step = 60.0 / 60.0; // default value: 1 min [min]
+        }
+
         // Use function propagate() to get the grountrack object
-        double step = 60.0 / 60.0; // [min] considering now 1 minute at a time
         std::vector<GroundTrack> gt = propagate(tle, start, end, step);
         std::vector<double> lat_vec, lon_vec;
         for (int i = 0; i < gt.size(); i++) {

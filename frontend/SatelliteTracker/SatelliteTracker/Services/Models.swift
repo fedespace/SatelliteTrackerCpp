@@ -19,8 +19,5 @@ struct TleRequest: Codable {
     var line2: String = ""
     var startTime: String = ""
     var endTime: String = ""
-}
-
-struct NameRequest: Codable {
-    let name: String
+    var stepInterval: String = ""
 }
