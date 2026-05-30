@@ -21,3 +21,10 @@ struct TleRequest: Codable {
     var endTime: String = ""
     var stepInterval: String = ""
 }
+
+struct NameRequest: Codable {
+    var name: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+    var stepInterval: String = ""
+}

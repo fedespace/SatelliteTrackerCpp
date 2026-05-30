@@ -70,17 +70,23 @@ int main() {
 
         res.set_content(result.dump(), "application/json");
 
+        std::cout << res.body;
+
     });
 
     svr.Post("/groundtrack/name", [](const httplib::Request& req, httplib::Response& res) {
-
+        std::cout << "method called";
         auto body = nlohmann::json::parse(req.body);
+        std::cout << body;
 
-        // Input type: Satellite Name
+        // Input type: Satellite Name (already parsed with spaces removed)
         std::string satName = body["name"].get<std::string>();
+        std::cout << satName;
+
+        // Celestrak URL using NAME as research
         std::string urlName = "/NORAD/elements/gp.php?NAME=" + satName + "&FORMAT=tle";
 
-        // Fetch TLE from Celestrak
+        // Fetch TLE from Celestrak client
         httplib::Client cli("https://celestrak.org");
         auto cliRes = cli.Get(urlName);
         auto tleJSON = nlohmann::json::parse(cliRes->body);
@@ -89,6 +95,8 @@ int main() {
         tle.name = body["name"].get<std::string>();
         tle.line1 = body["line1"].get<std::string>();
         tle.line2 = body["line2"].get<std::string>();
+
+        std::cout << tle.line1;
 
         // For now let's harcode input timeS, timeE. Then will be added to the body of the request.
         TimeUTC timeS = {2026, 2, 16, 1, 0, 0.0};

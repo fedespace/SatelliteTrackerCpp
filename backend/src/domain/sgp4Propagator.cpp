@@ -36,7 +36,7 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
         std::vector<double> lat_vec, lon_vec;
         std::vector<GroundTrack> gt;
 
-        double deltaT = timeE_min - timeS_min; // da cancellare?
+        double finalDelta = timeE_min - time_TLE_min;
 
         // Initialise variables
         double r[3], v[3];
@@ -45,7 +45,7 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
        //  double t = timeS_min; // the time that will keep incrementing in the groundtrack loop
 
         // While loop for the propagation and grountrack
-        while (tsince <= deltaT) {
+        while (tsince <= finalDelta) {
             SGP4Funcs::sgp4(satrec, tsince, r, v);
             double time = time_TLE_min + tsince; // [min]
             TimeUTC time_c = MJD20002epoch(time); // [year, month, day, hour, minute, seconds]
