@@ -29,26 +29,33 @@ struct GroundTrackService {
             tle.startTime = formatter.string(from: start)
             tle.endTime = formatter.string(from: end)
             tle.stepInterval = step
-            print(tle)
+            print("name: '\(tle.name)'")
+            print("line1: '\(tle.line1)'")
+            print("line2: '\(tle.line2)'")
             // Request
-            var request = URLRequest(url: URL(string: "http://172.20.10.13:8080/groundtrack/tle")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/tle")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             // Converting input (TLE) to JSON for the server
             request.httpBody = try JSONEncoder().encode(tle) // from swift to JSON and then to server
             let (data, _) = try await URLSession.shared.data(for:request)
-            print(String(data: data, encoding: .utf8) ?? "no data")
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
         case InputOptions.name:
             // Parse the Name object (if spaces are present)
             let parsedName = searchItem.replacingOccurrences(of: " ", with: "+")
+            var nameSat = NameRequest()
+            nameSat.name = parsedName
+            nameSat.startTime = formatter.string(from: start)
+            nameSat.endTime = formatter.string(from: end)
+            nameSat.stepInterval = step
             // Request
-            var request = URLRequest(url: URL(string: "http://172.20.10.13:8080/groundtrack/name")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/name")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             // Converting input (name) to JSON for the server
             request.httpBody = try JSONEncoder().encode(parsedName) // from swift to JSON and then to server
             let (data, _) = try await URLSession.shared.data(for:request)
+            print(String(data: data, encoding: .utf8) ?? "no data")
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
         case InputOptions.constellation:
             // call function to provide input as constellation to the main propagator
