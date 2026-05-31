@@ -11,8 +11,9 @@ import SwiftUI
 enum InputOptions: String, CaseIterable {
     case tle
     case name
-    case constellation
-    case mission
+    case norad
+    case iss
+    case hubble
 }
 
 struct InputPicker: View {

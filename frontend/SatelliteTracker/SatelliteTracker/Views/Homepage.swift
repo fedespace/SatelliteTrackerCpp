@@ -27,6 +27,7 @@ struct Homepage: View {
     @State private var endTime = Date()
     @State private var showEndTime = false
     @State private var step: String = ""
+    @State private var showTextfield: Bool = true
     
     var body: some View {
         
@@ -42,11 +43,35 @@ struct Homepage: View {
             VStack(alignment: .leading, spacing: 5) {
                 
                 // input picker
-                InputPicker(inputType: $inputType)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: inputType) {
-                        searchItem = ""
+                HStack {
+                    InputPicker(inputType: $inputType)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .onChange(of: inputType) {
+                            searchItem = ""
+                            if (inputType == InputOptions.iss || inputType == InputOptions.hubble) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    showTextfield = false
+                                }
+                            } else {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    showTextfield = true
+                                }
+                            }
+                        }
+                    
+                    Button("", systemImage: "arrow.right") {
+                        // Call the function to get the groundtrack data
+                        Task {
+                            if (endTime > startTime) {
+                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                            }
+                        }
                     }
+                    .tint(Color.burntSienna)
+                }
+                
+            
+                
                 
                 // Pick dates and toggle for single point or groundtrack
                 Grid(alignment: .leading, horizontalSpacing: 8){
@@ -109,23 +134,11 @@ struct Homepage: View {
                 .padding(.top, 10)
                 .padding(.bottom, 10)
                     
-                
-                // HSTACK with textfield & confirm arrow
-                HStack {
+                if (showTextfield) {
                     TextField(String("Search by \(inputType.rawValue.uppercased())..."), text: $searchItem)
-
-                    Button("", systemImage: "arrow.right") {
-                        // Call the function to get the groundtrack data
-                        Task {
-                            if (endTime > startTime) {
-                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
-                            }
-                        }
-                    }
-                    .tint(Color.burntSienna)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, 7)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 7)
                 
             }
             

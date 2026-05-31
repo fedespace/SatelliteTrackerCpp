@@ -54,11 +54,15 @@ struct GroundTrackService {
             let (data, _) = try await URLSession.shared.data(for:request)
             print(String(data: data, encoding: .utf8) ?? "no data")
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
-        case InputOptions.constellation:
+        case InputOptions.norad:
             // call function to provide input as constellation to the main propagator
             print("constellation")
             throw GroundTrackError.notImplemented
-        case InputOptions.mission:
+        case InputOptions.iss:
+            // call function to provide input as mission to the main propagator
+            print("mission")
+            throw GroundTrackError.notImplemented
+        case InputOptions.hubble:
             // call function to provide input as mission to the main propagator
             print("mission")
             throw GroundTrackError.notImplemented
