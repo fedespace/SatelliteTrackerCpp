@@ -5,6 +5,7 @@
 #include <iostream>
 #include <array>
 #include "../../external/sgp4/SGP4.h"
+#include <tuple>
 
 // ===============================
 
@@ -38,4 +39,6 @@ void standardise (Tle& tle);
 
 TleParam parseTLE(Tle tle);
 
-// OrbitClassif typeOfOrbit(const Tle& tle, double mu);
+std::string orbit_type(Tle tle);
+
+std::tuple<int, std::string> max_delta(std::string classification_orbit);

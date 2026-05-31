@@ -99,8 +99,6 @@ int main() {
         tle.line1.erase(tle.line1.find_last_not_of(" \t\r\n") + 1);
         tle.line2.erase(tle.line2.find_last_not_of(" \t\r\n") + 1);
 
-        std::cout << tle.line1;
-
         // Fetch Start and End timeUTC (from TLE body - JSON)
         std::string startString = body["startTime"].get<std::string>();
         std::string endString = body["endTime"].get<std::string>();

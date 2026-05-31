@@ -70,8 +70,6 @@ TleParam parseTLE(Tle tle) {
     char satnArray[6];
     satnString.copy(satnArray, 5, 2);
     std::memcpy(satn.data(), satnArray, 6);
-//     std::memcpy(satrec.satn, satnString.c_str(), 5);
-// satrec.satn[5] = '\0';
     double epoch = jd(tle);
     double dragInt = std::stod(tle.line1.substr(54, 5)) * 0.00001;
     int divide = std::stoi(tle.line1.substr(60, 1));
@@ -105,35 +103,52 @@ TleParam parseTLE(Tle tle) {
     };
 }
 
-// Define type of orbit
-// OrbitClassif typeOfOrbit(const Tle& tle, double mu) {
-//     OrbitClassif type;
-//     // Fetch mean motion, eccentricity and inclination from TLE elements
-//     double n_revDay = stod(tle.line2.substr(52,11)); // [rev/day]
-//     double e = stod(tle.line2.substr(26,7))/10e6;
-//     double i = stod(tle.line2.substr(8,8));
-//     // Computing semi major axis, rp and ra from n. Need to initialise satrec to get constant mu
-//     double n = n_revDay*(2*M_PI)/86400; // [rad/s]
-//     double a = cbrt(mu/(n*n));
-//     double rp = a*(1-e);
-//     double ra = a*(1+e);
-//     // Decision tree starting from the semi major axis
-//     if (a < 8300) {
-//         type = OrbitClassif::LEO;
-//     } else if (a >= 8300 && a < 42164) {
-//         if (e < 0.5) {
-//             type = OrbitClassif::MEO;
-//         } else {
-//             if (ra > 46000) {
-//                 type = OrbitClassif::HEO;
-//             } else {
-//                 type = OrbitClassif::GTO;
-//             }
-//         }
-//     }
-//     else if (a >= 42162 && a < 42167) {
-//         type = OrbitClassif::GEO;
-//     }
+// Compute the type of orbit
+std::string orbit_type(Tle tle) {
+    // Get parameters from TLE:
+    double no_kozai = std::stod(tle.line2.substr(52, 11)) * 2.0 * M_PI / 86400.0; // [rad/sec]
+    double earth_grav_constant = 3.98600441e14;
+    double a = std::pow(earth_grav_constant / (no_kozai*no_kozai), 1.0/3.0) / 1000.0; // [m]
+    double ecco = std::stod(tle.line2.substr(26, 7)) * 0.0000001; 
+    double inclo = std::stod(tle.line2.substr(8, 8)); // [deg]
+    double radius_apogee = a * (1 - ecco); // [km]
+    // IF statement
+    std::string type;
+    if (a < 8400) {
+        type = "LEO";
+    } else if (a > 8400 && a < 42164) {
+        if (ecco < 0.4) {
+            type = "MEO";
+        } else {
+            if (radius_apogee >= 40000) {
+                type = "HEO";
+            } else {
+                type = "GTO";
+            }
+        }
+    } else {
+        type = "GEO";
+    }
+    return type;
+}
 
-//     return type;
-// }
+std::tuple<int, std::string> max_delta(std::string classification_orbit) {
+    int maxDT;
+    std::string degrad_degree;
+    if (classification_orbit == "LEO") {
+        maxDT = 7 * 86400; // 7 days
+        degrad_degree = "1 to 3 km per day";
+    } else if (classification_orbit == "MEO") {
+        maxDT = 7 * 86400 * 3; // 3 weeks
+        degrad_degree = "0.5 to 1.5 km per day, up to 5 to 10 km per week";
+    } else if (classification_orbit == "GEO") {
+        maxDT = 7 * 86400 * 4; // 4 weeks
+        degrad_degree = "1 to 2 km per day";
+    } else if (classification_orbit == "GTO") {
+        maxDT = 3 * 86400;
+        degrad_degree = "5 to 20+ km per day, up to 10 of hundreds of km after 3 days";
+    } else if (classification_orbit == "HEO") {
+        degrad_degree = "5 to 20+ km per day, up to 10 of hundreds of km after 3 days";
+    }
+    return {maxDT, degrad_degree};
+}
