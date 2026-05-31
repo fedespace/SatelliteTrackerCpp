@@ -117,7 +117,9 @@ struct Homepage: View {
                     Button("", systemImage: "arrow.right") {
                         // Call the function to get the groundtrack data
                         Task {
-                            await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                            if (endTime > startTime) {
+                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                            }
                         }
                     }
                     .tint(Color.burntSienna)
