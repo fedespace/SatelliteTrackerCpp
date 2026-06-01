@@ -49,12 +49,18 @@ struct Homepage: View {
                         .onChange(of: inputType) {
                             searchItem = ""
                             if (inputType == InputOptions.iss || inputType == InputOptions.hubble) {
+                                Task {
+                                    if (endTime > startTime) {
+                                        await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                                    }
+                                }
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     showTextfield = false
                                 }
                             } else {
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     showTextfield = true
+                                    gtViewModel.points = [:]
                                 }
                             }
                         }

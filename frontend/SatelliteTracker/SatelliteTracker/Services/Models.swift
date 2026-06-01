@@ -28,3 +28,17 @@ struct NameRequest: Codable {
     var endTime: String = ""
     var stepInterval: String = ""
 }
+
+struct NoradRequest: Codable {
+    var norad: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+    var stepInterval: String = ""
+}
+
+struct ISS_HUBBLE: Codable {
+    var satellite: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+    var stepInterval: String = ""
+}
