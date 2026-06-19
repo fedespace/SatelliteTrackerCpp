@@ -13,35 +13,13 @@ int main() {
 
         auto body = nlohmann::json::parse(req.body);
 
-        // Input type: TLE
+        // Fetch from body
         Tle tle;
         tle.name = body["name"].get<std::string>();
         tle.line1 = body["line1"].get<std::string>();
         tle.line2 = body["line2"].get<std::string>();
-
-        // Fetch Start and End timeUTC (from TLE body - JSON)
         std::string startString = body["startTime"].get<std::string>();
         std::string endString = body["endTime"].get<std::string>();
-
-        // Initialise the TimeUTC object and fetch components
-        TimeUTC start;
-        TimeUTC end;
-        // ------------------
-        start.year = std::stoi(startString.substr(0,4));
-        start.month = std::stoi(startString.substr(5,2));
-        start.day = std::stoi(startString.substr(8,2));
-        start.hour = std::stoi(startString.substr(11,2));
-        start.minute = std::stoi(startString.substr(14,2));
-        start.second = std::stod(startString.substr(17,2));
-        // ------------------
-        end.year = std::stoi(endString.substr(0,4));
-        end.month = std::stoi(endString.substr(5,2));
-        end.day = std::stoi(endString.substr(8,2));
-        end.hour = std::stoi(endString.substr(11,2));
-        end.minute = std::stoi(endString.substr(14,2));
-        end.second = std::stod(endString.substr(17,2));
-
-        // Get the step from the user (if any)
         std::string stepString = body["stepInterval"].get<std::string>();
         double step;
         if (stepString != "") {
@@ -49,6 +27,10 @@ int main() {
         } else {
             step = 60.0 / 60.0; // default value: 1 min [min]
         }
+
+        // Convert times in TimeUTC objects
+        TimeUTC start = string2time(startString);
+        TimeUTC end = string2time(endString);
 
         // Use function propagate() to get the grountrack object
         std::vector<GroundTrack> gt = propagate(tle, start, end, step);
@@ -59,14 +41,7 @@ int main() {
         }
 
         // Serialize the result to JSON
-        nlohmann::json result;
-        std::vector<std::string> time_vec;
-        for (int i = 0; i < gt.size(); i++) {
-            TimeUTC time = gt[i].time;
-            std::string time_string = to_iso8601(time);
-            result[time_string]["lat"] = gt[i].lat;
-            result[time_string]["lon"] = gt[i].lon;
-        }
+        nlohmann::json result = serialize_gt(gt);
 
         res.set_content(result.dump(), "application/json");
     });
@@ -84,9 +59,8 @@ int main() {
         httplib::Client cli("http://celestrak.org");
         auto cliRes = cli.Get(urlName);
         auto rawTle = cliRes->body;
-        std::cout << "RAW TLE: [" << rawTle << "]" << std::endl;
 
-        // Parsing TLE from celestrak
+        // Fetch other inputs and parse TLE from Celestrak
         Tle tle;
         std::istringstream stream(rawTle);
         std::getline(stream, tle.name);
@@ -95,30 +69,8 @@ int main() {
         tle.name.erase(tle.name.find_last_not_of(" \t\r\n") + 1);
         tle.line1.erase(tle.line1.find_last_not_of(" \t\r\n") + 1);
         tle.line2.erase(tle.line2.find_last_not_of(" \t\r\n") + 1);
-
-        // Fetch Start and End timeUTC (from TLE body - JSON)
         std::string startString = body["startTime"].get<std::string>();
         std::string endString = body["endTime"].get<std::string>();
-
-        // Initialise the TimeUTC object and fetch components
-        TimeUTC start;
-        TimeUTC end;
-        // ------------------
-        start.year = std::stoi(startString.substr(0,4));
-        start.month = std::stoi(startString.substr(5,2));
-        start.day = std::stoi(startString.substr(8,2));
-        start.hour = std::stoi(startString.substr(11,2));
-        start.minute = std::stoi(startString.substr(14,2));
-        start.second = std::stod(startString.substr(17,2));
-        // ------------------
-        end.year = std::stoi(endString.substr(0,4));
-        end.month = std::stoi(endString.substr(5,2));
-        end.day = std::stoi(endString.substr(8,2));
-        end.hour = std::stoi(endString.substr(11,2));
-        end.minute = std::stoi(endString.substr(14,2));
-        end.second = std::stod(endString.substr(17,2));
-
-        // Get the step from the user (if any)
         std::string stepString = body["stepInterval"].get<std::string>();
         double step;
         if (stepString != "") {
@@ -127,6 +79,11 @@ int main() {
             step = 60.0 / 60.0; // default value: 1 min [min]
         }
 
+        // Convert times in TimeUTC objects
+        TimeUTC start = string2time(startString);
+        TimeUTC end = string2time(endString);
+
+        // Use function propagate() to get the grountrack object
         std::vector<GroundTrack> gt = propagate(tle, start, end, step);
         std::vector<double> lat_vec, lon_vec;
         for (int i = 0; i < gt.size(); i++) {
@@ -135,14 +92,7 @@ int main() {
         }
 
         // Serialize the result to JSON
-        nlohmann::json result;
-        std::vector<std::string> time_vec;
-        for (int i = 0; i < gt.size(); i++) {
-            TimeUTC time = gt[i].time;
-            std::string time_string = to_iso8601(time);
-            result[time_string]["lat"] = gt[i].lat;
-            result[time_string]["lon"] = gt[i].lon;
-        }
+        nlohmann::json result = serialize_gt(gt);
 
         res.set_content(result.dump(), "application/json");
     });
@@ -160,9 +110,8 @@ int main() {
         httplib::Client cli("http://celestrak.org");
         auto cliRes = cli.Get(urlName);
         auto rawTle = cliRes->body;
-        std::cout << "RAW TLE: [" << rawTle << "]" << std::endl;
 
-        // Parsing TLE from celestrak
+        // Fetch other inputs and parse TLE from Celestrak
         Tle tle;
         std::istringstream stream(rawTle);
         std::getline(stream, tle.name);
@@ -171,30 +120,8 @@ int main() {
         tle.name.erase(tle.name.find_last_not_of(" \t\r\n") + 1);
         tle.line1.erase(tle.line1.find_last_not_of(" \t\r\n") + 1);
         tle.line2.erase(tle.line2.find_last_not_of(" \t\r\n") + 1);
-
-        // Fetch Start and End timeUTC (from TLE body - JSON)
         std::string startString = body["startTime"].get<std::string>();
         std::string endString = body["endTime"].get<std::string>();
-
-        // Initialise the TimeUTC object and fetch components
-        TimeUTC start;
-        TimeUTC end;
-        // ------------------
-        start.year = std::stoi(startString.substr(0,4));
-        start.month = std::stoi(startString.substr(5,2));
-        start.day = std::stoi(startString.substr(8,2));
-        start.hour = std::stoi(startString.substr(11,2));
-        start.minute = std::stoi(startString.substr(14,2));
-        start.second = std::stod(startString.substr(17,2));
-        // ------------------
-        end.year = std::stoi(endString.substr(0,4));
-        end.month = std::stoi(endString.substr(5,2));
-        end.day = std::stoi(endString.substr(8,2));
-        end.hour = std::stoi(endString.substr(11,2));
-        end.minute = std::stoi(endString.substr(14,2));
-        end.second = std::stod(endString.substr(17,2));
-
-        // Get the step from the user (if any)
         std::string stepString = body["stepInterval"].get<std::string>();
         double step;
         if (stepString != "") {
@@ -203,6 +130,11 @@ int main() {
             step = 60.0 / 60.0; // default value: 1 min [min]
         }
 
+        // Convert times in TimeUTC objects
+        TimeUTC start = string2time(startString);
+        TimeUTC end = string2time(endString);
+
+        // Use function propagate() to get the grountrack object
         std::vector<GroundTrack> gt = propagate(tle, start, end, step);
         std::vector<double> lat_vec, lon_vec;
         for (int i = 0; i < gt.size(); i++) {
@@ -211,14 +143,7 @@ int main() {
         }
 
         // Serialize the result to JSON
-        nlohmann::json result;
-        std::vector<std::string> time_vec;
-        for (int i = 0; i < gt.size(); i++) {
-            TimeUTC time = gt[i].time;
-            std::string time_string = to_iso8601(time);
-            result[time_string]["lat"] = gt[i].lat;
-            result[time_string]["lon"] = gt[i].lon;
-        }
+        nlohmann::json result = serialize_gt(gt);
 
         res.set_content(result.dump(), "application/json");
     });
@@ -233,9 +158,8 @@ int main() {
         httplib::Client cli("http://celestrak.org");
         auto cliRes = cli.Get(urlName);
         auto rawTle = cliRes->body;
-        std::cout << "RAW TLE: [" << rawTle << "]" << std::endl;
 
-        // Parsing TLE from celestrak
+        // Fetch other inputs and parse TLE from Celestrak
         Tle tle;
         std::istringstream stream(rawTle);
         std::getline(stream, tle.name);
@@ -244,30 +168,8 @@ int main() {
         tle.name.erase(tle.name.find_last_not_of(" \t\r\n") + 1);
         tle.line1.erase(tle.line1.find_last_not_of(" \t\r\n") + 1);
         tle.line2.erase(tle.line2.find_last_not_of(" \t\r\n") + 1);
-
-        // Fetch Start and End timeUTC (from TLE body - JSON)
         std::string startString = body["startTime"].get<std::string>();
         std::string endString = body["endTime"].get<std::string>();
-
-        // Initialise the TimeUTC object and fetch components
-        TimeUTC start;
-        TimeUTC end;
-        // ------------------
-        start.year = std::stoi(startString.substr(0,4));
-        start.month = std::stoi(startString.substr(5,2));
-        start.day = std::stoi(startString.substr(8,2));
-        start.hour = std::stoi(startString.substr(11,2));
-        start.minute = std::stoi(startString.substr(14,2));
-        start.second = std::stod(startString.substr(17,2));
-        // ------------------
-        end.year = std::stoi(endString.substr(0,4));
-        end.month = std::stoi(endString.substr(5,2));
-        end.day = std::stoi(endString.substr(8,2));
-        end.hour = std::stoi(endString.substr(11,2));
-        end.minute = std::stoi(endString.substr(14,2));
-        end.second = std::stod(endString.substr(17,2));
-
-        // Get the step from the user (if any)
         std::string stepString = body["stepInterval"].get<std::string>();
         double step;
         if (stepString != "") {
@@ -276,6 +178,11 @@ int main() {
             step = 60.0 / 60.0; // default value: 1 min [min]
         }
 
+        // Convert times in TimeUTC objects
+        TimeUTC start = string2time(startString);
+        TimeUTC end = string2time(endString);
+
+        // Use function propagate() to get the grountrack object
         std::vector<GroundTrack> gt = propagate(tle, start, end, step);
         std::vector<double> lat_vec, lon_vec;
         for (int i = 0; i < gt.size(); i++) {
@@ -284,14 +191,7 @@ int main() {
         }
 
         // Serialize the result to JSON
-        nlohmann::json result;
-        std::vector<std::string> time_vec;
-        for (int i = 0; i < gt.size(); i++) {
-            TimeUTC time = gt[i].time;
-            std::string time_string = to_iso8601(time);
-            result[time_string]["lat"] = gt[i].lat;
-            result[time_string]["lon"] = gt[i].lon;
-        }
+        nlohmann::json result = serialize_gt(gt);
 
         res.set_content(result.dump(), "application/json");
 
@@ -300,3 +200,4 @@ int main() {
     std::cout << "Server listening on port 8080" << std::endl;
     svr.listen("0.0.0.0", 8080);
 }
+        
