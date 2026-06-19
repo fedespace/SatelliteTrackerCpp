@@ -2,6 +2,7 @@
 #include "TimeUTC.h"
 #include "TimeUtils.h"
 #include <string>
+#include <vector>
 #include <cmath>
 #include "../../external/sgp4/SGP4.h"
 #include <algorithm>

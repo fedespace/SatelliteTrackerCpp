@@ -222,3 +222,15 @@ std::string to_iso8601(TimeUTC time) {
         time.year, time.month, time.day, time.hour, time.minute, time.second);
     return buf;
 }
+
+TimeUTC string2time(std::string timeString) {
+    TimeUTC time;
+    time.year = std::stoi(timeString.substr(0,4));
+    time.month = std::stoi(timeString.substr(5,2));
+    time.day = std::stoi(timeString.substr(8,2));
+    time.hour = std::stoi(timeString.substr(11,2));
+    time.minute = std::stoi(timeString.substr(14,2));
+    time.second = std::stod(timeString.substr(17,2));
+
+    return time;
+}

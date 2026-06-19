@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include "Tle.h"
+#include <tuple>
 
 // ===============================
 
@@ -26,3 +27,6 @@ TimeUTC MJD20002epoch(double mjd_date);
 
 // Conversion from TimeUTC to String
 std::string to_iso8601(TimeUTC time);
+
+// Conversion from TimeUTC to single components
+TimeUTC string2time(std::string timeString);

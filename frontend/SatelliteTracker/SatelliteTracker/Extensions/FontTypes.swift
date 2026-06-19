@@ -23,4 +23,13 @@ extension Font {
     // Step / groundtrack buttons
     static let inputButtonsFont = Font.custom("Electrolize", size: 15)
 
+    // Start and End textfield for datepicker
+    static let startEndFont = Font.custom("Rajdhani-Medium", size: 18)
+    
+    // Hint textfield
+    static let textfieldFont = Font.custom("Rajdhani-Regular", size: 19)
+    
+    // Tracks / step hints
+    static let tracksStep = Font.custom("Rajdhani-Regular", size: 16)
 }
+

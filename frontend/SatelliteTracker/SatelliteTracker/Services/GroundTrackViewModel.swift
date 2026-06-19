@@ -18,11 +18,15 @@ class GroundTrackViewModel {
         points.sorted { $0.key < $1.key }
               .map { CLLocationCoordinate2D(latitude: $0.value.lat, longitude: $0.value.lon) }
     }
+    var satName: String = ""
+    var changedCoord: Bool = false
     
     func fetchGroundTrack(inputType: InputOptions, searchItem: String, start: Date, end: Date, step: String) async {
         isLoading = true
         do {
             points = try await GroundTrackService().fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: start, end: end, step: step)
+            satName = points.first?.value.name ?? ""
+        changedCoord = true
             print(points)
         } catch {
             errorMessage = error.localizedDescription
