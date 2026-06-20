@@ -29,6 +29,7 @@ struct TleParam {
     double mo; // [rad]
     double no_kozai; // [rad/min]
     double nodeo; // [rad]
+    std::string satnString;
 };
 
 void validate(Tle& tle);

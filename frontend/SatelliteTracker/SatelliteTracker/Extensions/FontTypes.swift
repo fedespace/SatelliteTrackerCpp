@@ -31,5 +31,8 @@ extension Font {
     
     // Tracks / step hints
     static let tracksStep = Font.custom("Rajdhani-Regular", size: 16)
+    
+    // Details Title
+    static let detailTitle = Font.custom("Eunomia-Regular", size: 20)
 }
 
