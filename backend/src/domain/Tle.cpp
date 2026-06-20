@@ -66,7 +66,7 @@ void standardise (Tle& tle) {
 TleParam parseTLE(Tle tle) {
     gravconsttype whichconst = wgs72; // standard for TLE
     char opsmode = 'i'; // 'improved'
-    std::string satnString = tle.line1.substr(1, 5);
+    std::string satnString = tle.line1.substr(2, 5);
     std::array<char,6> satn = {}; 
     char satnArray[6];
     satnString.copy(satnArray, 5, 2);
@@ -100,7 +100,8 @@ TleParam parseTLE(Tle tle) {
         inclo,
         mo,
         no_kozai,
-        nodeo
+        nodeo,
+        satnString
     };
 }
 

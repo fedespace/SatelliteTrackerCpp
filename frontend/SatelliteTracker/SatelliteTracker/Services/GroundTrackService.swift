@@ -32,7 +32,7 @@ struct GroundTrackService {
             tle.endTime = endFormatted
             tle.stepInterval = step
             // Request
-            var request = URLRequest(url: URL(string: "http://172.20.10.13:8080/groundtrack/tle")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/tle")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             // Converting input (TLE) to JSON for the server
@@ -44,7 +44,7 @@ struct GroundTrackService {
             let parsedName = searchItem.replacingOccurrences(of: " ", with: "+")
             let nameSat = NameRequest(name: parsedName, startTime: startFormatted, endTime: endFormatted, stepInterval: step)
             // Request
-            var request = URLRequest(url: URL(string: "http://192.168.0.19:8080/groundtrack/name")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/name")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             // Converting input (name) to JSON for the server
@@ -54,7 +54,7 @@ struct GroundTrackService {
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
         case InputOptions.norad:
             let noradReq = NoradRequest(norad: searchItem, startTime: startFormatted, endTime: endFormatted, stepInterval: step)
-            var request = URLRequest(url: URL(string: "http://192.168.0.19:8080/groundtrack/norad")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/norad")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(noradReq) // from swift to JSON and then to server
@@ -68,7 +68,7 @@ struct GroundTrackService {
             } else {
                 defaultReq.satellite = "HST"
             }
-            var request = URLRequest(url: URL(string: "http://192.168.0.19:8080/groundtrack/default")!)
+            var request = URLRequest(url: URL(string: "http://127.0.0.1:8080/groundtrack/default")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(defaultReq)
@@ -76,8 +76,5 @@ struct GroundTrackService {
             print(String(data: data, encoding: .utf8) ?? "no data")
             return try JSONDecoder().decode([String: GroundTrackPoint].self, from: data)
         }
-        
-     
     }
-    
 }

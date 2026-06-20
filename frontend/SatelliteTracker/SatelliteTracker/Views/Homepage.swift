@@ -20,13 +20,15 @@ struct Homepage: View {
     @State private var step: String = ""
     @State private var showTextfield: Bool = true
     @State private var showDetails: Bool = false
-    @State private var updateCenterMap: Bool = false
     @State private var mapC: MapCameraPosition = .camera(MapCamera(
         centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
         distance: 200_000_000,
         heading: 0.0,
         pitch: 0.0
     ))
+    @State private var detailsViewModel = SatelliteDetailsViewModel()
+    var noradID: String {gtViewModel.norad}
+    @State private var purpose: String = ""
 
     
     var body: some View {
@@ -57,7 +59,7 @@ struct Homepage: View {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                     }
                                 }
-                                showDetails.toggle()
+                                showDetails = true
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     showTextfield = false
                                 }
@@ -77,7 +79,7 @@ struct Homepage: View {
                                 await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                             }
                         }
-                        showDetails.toggle()
+                        showDetails = true
                     }
                     .tint(Color.burntSienna)
                 }
@@ -113,7 +115,7 @@ struct Homepage: View {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                     }
                                 }
-                                showDetails.toggle()
+                                showDetails = true
                             }
                         
                         // Toggle for end time picker
@@ -138,7 +140,7 @@ struct Homepage: View {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
                                     }
-                                    showDetails.toggle()
+                                    showDetails = true
                                 }
                             }
         
@@ -165,7 +167,7 @@ struct Homepage: View {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
                                     }
-                                    showDetails.toggle()
+                                    showDetails = true
                                 }
                             
                             // Step selection (interval between two computations)
@@ -225,24 +227,45 @@ struct Homepage: View {
             .mapStyle(.standard(elevation: .flat))
                 
             if(showDetails) {
-                VStack{
-                    Text(gtViewModel.satName)
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    VStack { // the entire bubble for all details
+                        Text("\(gtViewModel.satName), NORAD ID: \(gtViewModel.norad)")
+                            .font(Font.detailTitle).foregroundStyle(Color.burntSienna)
+                        
+                        HStack {
+                            Text("Function")
+                            Text(purpose)
+                                .onChange(of: noradID, { oldValue, newValue in
+                                    Task {
+                                        purpose = await detailsViewModel.fetchDetails(norad: newValue).launchSite
+                                        print("launchSite: \(await detailsViewModel.fetchDetails(norad: newValue).launchSite)")
+
+                                    }
+                                })
+    
+                                
+                        
+                                
+                            
+                        }
+                        
+
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 150.0)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(Color.forestGreen, lineWidth: 1)
+                    )
                 }
-                .frame(maxWidth: .infinity, minHeight: 150.0)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Color.forestGreen, lineWidth: 1)
-                )
             }
             
-                
+            Spacer()
         }
         .padding(.top, 60)
         .padding([.leading, .trailing], 30)
         .ignoresSafeArea()
         
-        Spacer()
     }
 }
    
