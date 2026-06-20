@@ -26,7 +26,7 @@ class GroundTrackViewModel {
         do {
             points = try await GroundTrackService().fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: start, end: end, step: step)
             satName = points.first?.value.name ?? ""
-        changedCoord = true
+            changedCoord = true
             print(points)
         } catch {
             errorMessage = error.localizedDescription
