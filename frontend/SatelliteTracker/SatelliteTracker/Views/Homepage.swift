@@ -14,10 +14,6 @@ struct Homepage: View {
     @State private var inputType: InputOptions = .tle
     @State private var searchItem: String = ""
     @State private var gtViewModel = GroundTrackViewModel()
-    @State private var mapRegion: MKCoordinateRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-        span: MKCoordinateSpan(latitudeDelta: 180, longitudeDelta: 360))
-    @State private var mapCamera: MapCameraPosition = .automatic
     @State private var startTime = Date()
     @State private var endTime = Date()
     @State private var showEndTime = false
@@ -25,6 +21,13 @@ struct Homepage: View {
     @State private var showTextfield: Bool = true
     @State private var showDetails: Bool = false
     @State private var updateCenterMap: Bool = false
+    @State private var mapC: MapCameraPosition = .camera(MapCamera(
+        centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+        distance: 200_000_000,
+        heading: 0.0,
+        pitch: 0.0
+    ))
+
     
     var body: some View {
         
@@ -54,12 +57,6 @@ struct Homepage: View {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                     }
                                 }
-                                mapCamera = .camera(
-                                    MapCamera(
-                                        centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                                        distance: 200_000_000,
-                                        heading: 0.0,
-                                        pitch: 0.0))
                                 showDetails.toggle()
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     showTextfield = false
@@ -80,12 +77,6 @@ struct Homepage: View {
                                 await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                             }
                         }
-                        mapCamera = .camera(
-                            MapCamera(
-                                centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                                distance: 200_000_000,
-                                heading: 0.0,
-                                pitch: 0.0))
                         showDetails.toggle()
                     }
                     .tint(Color.burntSienna)
@@ -122,12 +113,6 @@ struct Homepage: View {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                     }
                                 }
-                                mapCamera = .camera(
-                                    MapCamera(
-                                        centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                                        distance: 200_000_000,
-                                        heading: 0.0,
-                                        pitch: 0.0))
                                 showDetails.toggle()
                             }
                         
@@ -153,12 +138,6 @@ struct Homepage: View {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
                                     }
-                                    mapCamera = .camera(
-                                        MapCamera(
-                                            centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                                            distance: 200_000_000,
-                                            heading: 0.0,
-                                            pitch: 0.0))
                                     showDetails.toggle()
                                 }
                             }
@@ -186,12 +165,6 @@ struct Homepage: View {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
                                     }
-                                    mapCamera = .camera(
-                                        MapCamera(
-                                            centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                                            distance: 200_000_000,
-                                            heading: 0.0,
-                                            pitch: 0.0))
                                     showDetails.toggle()
                                 }
                             
@@ -218,9 +191,11 @@ struct Homepage: View {
         
             
             // View of the 2D Map
-            Map (initialPosition: mapCamera) {
+            Map (position: $mapC) {
+            
                 MapPolyline(coordinates: gtViewModel.coordinates)
                     .stroke(Color.darkSlateGrey, lineWidth: 2)
+                
                 
                 ForEach(gtViewModel.coordinates, id: \.latitude) { point in
                     let c = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
@@ -230,6 +205,21 @@ struct Homepage: View {
                     }
                 }
             }
+            .onChange(of: gtViewModel.coordinates.first?.latitude, {
+                mapC = gtViewModel.coordinates.first?.latitude != nil ?
+                    .camera(MapCamera(
+                        centerCoordinate: gtViewModel.coordinates.first!,
+                        distance: 200_000_000,
+                        heading: 0.0,
+                        pitch: 0.0
+                        ))
+                    : .camera(MapCamera(
+                        centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                        distance: 200_000_000,
+                        heading: 0.0,
+                        pitch: 0.0
+                        ))
+            })
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .frame(maxHeight: 300)
             .mapStyle(.standard(elevation: .flat))
