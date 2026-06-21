@@ -34,5 +34,11 @@ extension Font {
     
     // Details Title
     static let detailTitle = Font.custom("Eunomia-Regular", size: 20)
+    
+    // Details body
+    static let detailBody = Font.custom("Electrolize", size: 17)
+    
+    // Subtitle details body
+    static let subtitleDetail = Font.custom("Electrolize", size: 19)
 }
 
