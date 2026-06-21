@@ -27,142 +27,101 @@ struct Homepage: View {
         pitch: 0.0
     ))
     @State private var detailsViewModel = SatelliteDetailsViewModel()
-    var noradID: String {gtViewModel.norad}
-    @State private var purpose: String = ""
+    var noradID: String { gtViewModel.norad }
+    @State private var detailsSatellite = SatelliteDetails.empty
+    @State private var isDetailVisible: Bool = false
+    var opsStatus: String {detailsSatellite.opsStatusCode}
+    var owner: String {detailsSatellite.owner}
+    var launchDate: String {detailsSatellite.launched}
+    var launchSite: String {detailsSatellite.launchSite}
+    var periodOrbit: Double {detailsSatellite.period}
+    var inclinationOrbit: Double {detailsSatellite.incl}
+    var apogee: Int {detailsSatellite.apogee}
+    var perigee: Int {detailsSatellite.perigee}
 
     
     var body: some View {
         
-        // VSTACK #1 - TITLE + INPUTS + EARTH MAP ==================================================================================
-        VStack(spacing: 10) {
+        ScrollView {
             
-            // TITLE ===============================================================================================================
-            Text("SkyLens")
-                .font(.mainTitleFont)
-                .kerning(7)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            // VSTACK #2 - HSTACK(INPUT PICKER + ARROW BUTTON) + GRID (START / END? PICKER ROWS) + TEXTFIELD? ======================
-            VStack(alignment: .leading, spacing: 5.0) {
+            // VSTACK #1 - TITLE + INPUTS + EARTH MAP ==================================================================================
+            VStack(spacing: 10) {
                 
-                // HSTACK #1 - INPUT TYPE PICKER + ARROW BUTTON ====================================================================
-                HStack {
-                    InputPicker(inputType: $inputType)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: inputType) {
-                            searchItem = ""
-                            if (inputType == InputOptions.iss || inputType == InputOptions.hubble) {
-                                // Call directly the function to get the groundtrack data using either ISS or HUBBLE as input
-                                Task {
-                                    endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
-                                    if (endTime > startTime) {
-                                        await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
-                                    }
-                                }
-                                showDetails = true
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showTextfield = false
-                                }
-                            } else {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showTextfield = true
-                                    gtViewModel.points = [:]
-                                }
-                            }
-                        }
+                // TITLE ===============================================================================================================
+                Text("SkyLens")
+                    .font(.mainTitleFont)
+                    .kerning(7)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // VSTACK #2 - HSTACK(INPUT PICKER + ARROW BUTTON) + GRID (START / END? PICKER ROWS) + TEXTFIELD? ======================
+                VStack(alignment: .leading, spacing: 5.0) {
                     
-                    Button("", systemImage: "arrow.right") {
-                        // Call the function to get the groundtrack data
-                        Task {
-                            endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
-                            if (endTime > startTime) {
-                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
-                            }
-                        }
-                        showDetails = true
-                    }
-                    .tint(Color.burntSienna)
-                }
-                
-                if (showTextfield) {
-                    TextField(String("Search by \(inputType.rawValue.uppercased())..."), text: $searchItem)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, 7)
-                        .font(.textfieldFont)
-                }
-                
-                // GRID #1 - START TEXT + DATE + TRACK TOGGLE (optional END TEXT + DATE + STEP) =====================================
-                Grid(alignment: .leading, horizontalSpacing: 8){
-                    
-                    // GRID ROW for start date & time selection =====================================================================
-                    GridRow(alignment: .center) {
-                        
-                        // Label for start picker
-                        Text("Start")
-                            .font(Font.startEndFont).kerning(2)
-                            .gridColumnAlignment(.trailing)
-                        
-                        // Start date and time picker
-                        DatePicker("", selection: $startTime, displayedComponents: [.date, .hourAndMinute])
-                            .datePickerStyle(.compact)
-                            .gridColumnAlignment(.center)
-                            .fixedSize()
-                            .font(Font.startEndFont)
-                            .onChange(of: startTime) {
-                                Task {
-                                    endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
-                                    if (endTime > startTime) {
-                                        await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
-                                    }
-                                }
-                                showDetails = true
-                            }
-                        
-                        // Toggle for end time picker
-                        RoundedRectangle(cornerRadius: 5)
-                            .fill(showEndTime ? Color.gray.opacity(0.2) : Color.clear)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke(showEndTime ? Color.gray : Color.gray.opacity(0.4), lineWidth: 1)
-                                .overlay(Text("Tracks?")
-                                    .foregroundStyle(Color.gray)
-                                    .font(Font.tracksStep)
-                                    .padding(8))
-                                    )
-                            .frame(width: 75, height: 25)
-                            .onTapGesture {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showEndTime.toggle()
-                                    // one sec difference from start to be able to kick off propagator
-                                    endTime = (showEndTime) ? startTime.addingTimeInterval(60.0) : startTime.addingTimeInterval(1.0)
+                    // HSTACK #1 - INPUT TYPE PICKER + ARROW BUTTON ====================================================================
+                    HStack {
+                        InputPicker(inputType: $inputType)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .onChange(of: inputType) {
+                                searchItem = ""
+                                if (inputType == InputOptions.iss || inputType == InputOptions.hubble) {
+                                    // Call directly the function to get the groundtrack data using either ISS or HUBBLE as input
                                     Task {
+                                        endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                         if (endTime > startTime) {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
                                     }
                                     showDetails = true
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showTextfield = false
+                                    }
+                                } else {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showTextfield = true
+                                        gtViewModel.points = [:]
+                                    }
                                 }
                             }
-        
+                        
+                        Button("", systemImage: "arrow.right") {
+                            // Call the function to get the groundtrack data
+                            Task {
+                                endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
+                                if (endTime > startTime) {
+                                    await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                                }
+                            }
+                            showDetails = true
+                        }
+                        .tint(Color.burntSienna)
                     }
-                    .padding(.top, -10.0)
                     
+                    if (showTextfield) {
+                        TextField(String("Search by \(inputType.rawValue.uppercased())..."), text: $searchItem)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 7)
+                            .font(.textfieldFont)
+                    }
                     
-                    // GRID ROW in case "tracks" option is selected ==================================================================
-                    if showEndTime {
+                    // GRID #1 - START TEXT + DATE + TRACK TOGGLE (optional END TEXT + DATE + STEP) =====================================
+                    Grid(alignment: .leading, horizontalSpacing: 8){
+                        
+                        // GRID ROW for start date & time selection =====================================================================
                         GridRow(alignment: .center) {
                             
-                            // Label for end picker
-                            Text("End")
-                                .font(Font.startEndFont).kerning(4).gridColumnAlignment(.trailing)
+                            // Label for start picker
+                            Text("Start")
+                                .font(Font.startEndFont).kerning(2)
+                                .gridColumnAlignment(.trailing)
                             
-                            // End date and time picker
-                            DatePicker("", selection: $endTime, displayedComponents: [.date, .hourAndMinute])
+                            // Start date and time picker
+                            DatePicker("", selection: $startTime, displayedComponents: [.date, .hourAndMinute])
                                 .datePickerStyle(.compact)
+                                .gridColumnAlignment(.center)
                                 .fixedSize()
-                                .font(Font.inputButtonsFont)
-                                .onChange(of: endTime) {
+                                .font(Font.startEndFont)
+                                .onChange(of: startTime) {
                                     Task {
+                                        endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                         if (endTime > startTime) {
                                             await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
                                         }
@@ -170,101 +129,185 @@ struct Homepage: View {
                                     showDetails = true
                                 }
                             
-                            // Step selection (interval between two computations)
+                            // Toggle for end time picker
                             RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.clear)
+                                .fill(showEndTime ? Color.gray.opacity(0.2) : Color.clear)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 5)
-                                    .stroke(Color.gray, lineWidth: 1)
-                                    .overlay(TextField("Step [m]", text: $step).keyboardType(.numberPad)
-                                        .foregroundStyle(Color.gray)
-                                        .font(Font.tracksStep)
-                                        .padding(8))
-                                        )
+                                        .stroke(showEndTime ? Color.gray : Color.gray.opacity(0.4), lineWidth: 1)
+                                        .overlay(Text("Tracks?")
+                                            .foregroundStyle(Color.gray)
+                                            .font(Font.tracksStep)
+                                            .padding(8))
+                                )
                                 .frame(width: 75, height: 25)
+                                .onTapGesture {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showEndTime.toggle()
+                                        // one sec difference from start to be able to kick off propagator
+                                        endTime = (showEndTime) ? startTime.addingTimeInterval(60.0) : startTime.addingTimeInterval(1.0)
+                                        Task {
+                                            if (endTime > startTime) {
+                                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                                            }
+                                        }
+                                        showDetails = true
+                                    }
+                                }
+                            
                         }
+                        .padding(.top, -10.0)
+                        
+                        
+                        // GRID ROW in case "tracks" option is selected ==================================================================
+                        if showEndTime {
+                            GridRow(alignment: .center) {
+                                
+                                // Label for end picker
+                                Text("End")
+                                    .font(Font.startEndFont).kerning(4).gridColumnAlignment(.trailing)
+                                
+                                // End date and time picker
+                                DatePicker("", selection: $endTime, displayedComponents: [.date, .hourAndMinute])
+                                    .datePickerStyle(.compact)
+                                    .fixedSize()
+                                    .font(Font.inputButtonsFont)
+                                    .onChange(of: endTime) {
+                                        Task {
+                                            if (endTime > startTime) {
+                                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem, start: startTime, end: endTime, step: step)
+                                            }
+                                        }
+                                        showDetails = true
+                                    }
+                                
+                                // Step selection (interval between two computations)
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(Color.clear)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 5)
+                                            .stroke(Color.gray, lineWidth: 1)
+                                            .overlay(TextField("Step [m]", text: $step).keyboardType(.numberPad)
+                                                .foregroundStyle(Color.gray)
+                                                .font(Font.tracksStep)
+                                                .padding(8))
+                                    )
+                                    .frame(width: 75, height: 25)
+                            }
+                        }
+                        
                     }
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
                     
                 }
-                .padding(.top, 10)
-                .padding(.bottom, 10)
-                
-            }
-        
-            
-            // View of the 2D Map
-            Map (position: $mapC) {
-            
-                MapPolyline(coordinates: gtViewModel.coordinates)
-                    .stroke(Color.darkSlateGrey, lineWidth: 2)
                 
                 
-                ForEach(gtViewModel.coordinates, id: \.latitude) { point in
-                    let c = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
-                    Annotation("", coordinate: c) {
-                        Circle().fill(Color.burntSienna)
-                            .frame(width: 5, height: 5)
+                // View of the 2D Map
+                Map (position: $mapC) {
+                    
+                    MapPolyline(coordinates: gtViewModel.coordinates)
+                        .stroke(Color.darkSlateGrey, lineWidth: 2)
+                    
+                    
+                    ForEach(gtViewModel.coordinates, id: \.latitude) { point in
+                        let c = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
+                        Annotation("", coordinate: c) {
+                            Circle().fill(Color.burntSienna)
+                                .frame(width: 5, height: 5)
+                        }
                     }
                 }
-            }
-            .onChange(of: gtViewModel.coordinates.first?.latitude, {
-                mapC = gtViewModel.coordinates.first?.latitude != nil ?
-                    .camera(MapCamera(
-                        centerCoordinate: gtViewModel.coordinates.first!,
-                        distance: 200_000_000,
-                        heading: 0.0,
-                        pitch: 0.0
+                .onChange(of: gtViewModel.coordinates.first?.latitude, {
+                    mapC = gtViewModel.coordinates.first?.latitude != nil ?
+                        .camera(MapCamera(
+                            centerCoordinate: gtViewModel.coordinates.first!,
+                            distance: 200_000_000,
+                            heading: 0.0,
+                            pitch: 0.0
                         ))
                     : .camera(MapCamera(
                         centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
                         distance: 200_000_000,
                         heading: 0.0,
                         pitch: 0.0
-                        ))
-            })
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .frame(maxHeight: 300)
-            .mapStyle(.standard(elevation: .flat))
+                    ))
+                })
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .frame(minHeight: 300, maxHeight: 300)
+                .mapStyle(.standard(elevation: .flat))
                 
-            if(showDetails) {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    VStack { // the entire bubble for all details
-                        Text("\(gtViewModel.satName), NORAD ID: \(gtViewModel.norad)")
-                            .font(Font.detailTitle).foregroundStyle(Color.burntSienna)
-                        
-                        HStack {
-                            Text("Function")
-                            Text(purpose)
-                                .onChange(of: noradID, { oldValue, newValue in
-                                    Task {
-                                        purpose = await detailsViewModel.fetchDetails(norad: newValue).launchSite
-                                        print("launchSite: \(await detailsViewModel.fetchDetails(norad: newValue).launchSite)")
-
+                if(showDetails) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        ScrollView {
+                            VStack (alignment: .leading) { // the entire bubble for all details
+                                Text("\(gtViewModel.satName), NORAD ID: \(gtViewModel.norad)")
+                                    .font(Font.detailTitle).foregroundStyle(Color.burntSienna)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .padding(.bottom, 15)
+                                
+                                if (opsStatus == "-" || opsStatus == "D") {
+                                    HStack {
+                                        Text("Not Operational")
+                                            .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
+                                        Image(systemName: "x.circle")
                                     }
-                                })
-    
+                                } else {
+                                    HStack {
+                                        Text("Operational")
+                                            .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
+                                        Image(systemName: "checkmark.circle")
+                                    }
+                                }
+                                    
                                 
-                        
+                                Text("Owner: \(owner)")
+                                    .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
                                 
-                            
+                                Text("Launched on: \(launchDate)")
+                                    .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
+                                Text("From: \(launchSites[launchSite] ?? launchSite)")
+                                    .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
+                                
+                                VStack (alignment: .trailing){
+                                    Text("Orbital Elements").font(Font.subtitleDetail)
+                                    Text("Period: \(periodOrbit) min")
+                                    Text("Semi-major Axis: \((apogee + perigee)/2 + 6371) km")
+                                    Text("Inclination: \(inclinationOrbit) degrees")
+                                    Text("Apogee Altitude: \(apogee) km")
+                                    Text("Perigee Altitude: \(perigee) km")
+                                }
+                                .padding(.top, 15)
+                                .frame(maxWidth: .infinity)
+                                .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
+                            }
+                            .padding(.vertical, 30)
+                            .padding(.leading, 30)
+                            .frame(maxWidth: .infinity, minHeight: 150.0)
+                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .stroke(Color.forestGreen, lineWidth: 1)
+                            )
+                            .opacity(isDetailVisible ? 1 : 0)
+                            .onChange(of: noradID, { oldValue, newValue in
+                                Task {
+                                    detailsSatellite = await detailsViewModel.fetchDetails(norad: newValue)
+                                    withAnimation {
+                                        isDetailVisible = true
+                                    }
+                                }
+                            })
                         }
-                        
-
                     }
-                    .frame(maxWidth: .infinity, minHeight: 150.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .stroke(Color.forestGreen, lineWidth: 1)
-                    )
                 }
+                
+                Spacer()
             }
-            
-            Spacer()
+            .padding(.top, 60)
+            .padding([.leading, .trailing], 30)
+            .ignoresSafeArea()
         }
-        .padding(.top, 60)
-        .padding([.leading, .trailing], 30)
-        .ignoresSafeArea()
         
     }
 }
