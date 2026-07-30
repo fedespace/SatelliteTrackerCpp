@@ -6,30 +6,76 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1823A8442FFE9F4C00EB5230 /* SavedSatellites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1823A8432FFE9F4700EB5230 /* SavedSatellites.swift */; };
+		1823A8462FFEA00800EB5230 /* UserDefaultFavouritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1823A8452FFE9FFD00EB5230 /* UserDefaultFavouritesStore.swift */; };
+		1823A8482FFEA18800EB5230 /* FavouritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1823A8472FFEA17100EB5230 /* FavouritesStore.swift */; };
+		185C690B2FEDAC8E00BA3868 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 185C68FD2FEDAC8E00BA3868 /* Assets.xcassets */; };
+		185C691D2FEDAC8E00BA3868 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C68FE2FEDAC8E00BA3868 /* ContentView.swift */; };
+		185C691E2FEDAC8E00BA3868 /* SatelliteTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69002FEDAC8E00BA3868 /* SatelliteTrackerApp.swift */; };
+		185C693D2FEDACAD00BA3868 /* Rajdhani-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C692D2FEDACAD00BA3868 /* Rajdhani-SemiBold.ttf */; };
+		185C693E2FEDACAD00BA3868 /* Playfair.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69282FEDACAD00BA3868 /* Playfair.ttf */; };
+		185C693F2FEDACAD00BA3868 /* Eunomia-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69252FEDACAD00BA3868 /* Eunomia-Light.otf */; };
+		185C69402FEDACAD00BA3868 /* Eunomia-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69242FEDACAD00BA3868 /* Eunomia-Bold.otf */; };
+		185C69412FEDACAD00BA3868 /* Rajdhani-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C692B2FEDACAD00BA3868 /* Rajdhani-Medium.ttf */; };
+		185C69422FEDACAD00BA3868 /* Electrolize.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69232FEDACAD00BA3868 /* Electrolize.ttf */; };
+		185C69432FEDACAD00BA3868 /* Rajdhani-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69292FEDACAD00BA3868 /* Rajdhani-Bold.ttf */; };
+		185C69442FEDACAD00BA3868 /* Rajdhani-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C692A2FEDACAD00BA3868 /* Rajdhani-Light.ttf */; };
+		185C69452FEDACAD00BA3868 /* Eunomia-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 185C69262FEDACAD00BA3868 /* Eunomia-Regular.otf */; };
+		185C69462FEDACAD00BA3868 /* Rajdhani-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 185C692C2FEDACAD00BA3868 /* Rajdhani-Regular.ttf */; };
+		185C69472FEDACAD00BA3868 /* FontTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69272FEDACAD00BA3868 /* FontTypes.swift */; };
+		185C69482FEDACAD00BA3868 /* GS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69382FEDACAD00BA3868 /* GS.swift */; };
+		185C69492FEDACAD00BA3868 /* SatelliteDetailsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69322FEDACAD00BA3868 /* SatelliteDetailsService.swift */; };
+		185C694A2FEDACAD00BA3868 /* GroundTrackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69302FEDACAD00BA3868 /* GroundTrackViewModel.swift */; };
+		185C694B2FEDACAD00BA3868 /* GroundTrackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C692F2FEDACAD00BA3868 /* GroundTrackService.swift */; };
+		185C694C2FEDACAD00BA3868 /* SatelliteElementsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69342FEDACAD00BA3868 /* SatelliteElementsService.swift */; };
+		185C694D2FEDACAD00BA3868 /* SatelliteElementsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69352FEDACAD00BA3868 /* SatelliteElementsViewModel.swift */; };
+		185C694E2FEDACAD00BA3868 /* SatelliteDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69332FEDACAD00BA3868 /* SatelliteDetailsViewModel.swift */; };
+		185C694F2FEDACAD00BA3868 /* Homepage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69392FEDACAD00BA3868 /* Homepage.swift */; };
+		185C69502FEDACAD00BA3868 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69372FEDACAD00BA3868 /* Alert.swift */; };
+		185C69512FEDACAD00BA3868 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69312FEDACAD00BA3868 /* Models.swift */; };
+		185C69522FEDACAD00BA3868 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C693B2FEDACAD00BA3868 /* Settings.swift */; };
+		185C69532FEDACAD00BA3868 /* Map3d.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C693A2FEDACAD00BA3868 /* Map3d.swift */; };
+		185C69542FEDACAD00BA3868 /* InputPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C691F2FEDACAD00BA3868 /* InputPicker.swift */; };
+		185C69552FEDACAD00BA3868 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69202FEDACAD00BA3868 /* TabBar.swift */; };
+		185C69562FEDACAD00BA3868 /* ColorsCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69222FEDACAD00BA3868 /* ColorsCodes.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1817C6832FBDCB1C009A4509 /* SatelliteTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SatelliteTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1823A8432FFE9F4700EB5230 /* SavedSatellites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedSatellites.swift; sourceTree = "<group>"; };
+		1823A8452FFE9FFD00EB5230 /* UserDefaultFavouritesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultFavouritesStore.swift; sourceTree = "<group>"; };
+		1823A8472FFEA17100EB5230 /* FavouritesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouritesStore.swift; sourceTree = "<group>"; };
+		185C68FD2FEDAC8E00BA3868 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		185C68FE2FEDAC8E00BA3868 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		185C69002FEDAC8E00BA3868 /* SatelliteTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatelliteTrackerApp.swift; sourceTree = "<group>"; };
+		185C691F2FEDACAD00BA3868 /* InputPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputPicker.swift; sourceTree = "<group>"; };
+		185C69202FEDACAD00BA3868 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
+		185C69222FEDACAD00BA3868 /* ColorsCodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsCodes.swift; sourceTree = "<group>"; };
+		185C69232FEDACAD00BA3868 /* Electrolize.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Electrolize.ttf; sourceTree = "<group>"; };
+		185C69242FEDACAD00BA3868 /* Eunomia-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Eunomia-Bold.otf"; sourceTree = "<group>"; };
+		185C69252FEDACAD00BA3868 /* Eunomia-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Eunomia-Light.otf"; sourceTree = "<group>"; };
+		185C69262FEDACAD00BA3868 /* Eunomia-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Eunomia-Regular.otf"; sourceTree = "<group>"; };
+		185C69272FEDACAD00BA3868 /* FontTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontTypes.swift; sourceTree = "<group>"; };
+		185C69282FEDACAD00BA3868 /* Playfair.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Playfair.ttf; sourceTree = "<group>"; };
+		185C69292FEDACAD00BA3868 /* Rajdhani-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rajdhani-Bold.ttf"; sourceTree = "<group>"; };
+		185C692A2FEDACAD00BA3868 /* Rajdhani-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rajdhani-Light.ttf"; sourceTree = "<group>"; };
+		185C692B2FEDACAD00BA3868 /* Rajdhani-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rajdhani-Medium.ttf"; sourceTree = "<group>"; };
+		185C692C2FEDACAD00BA3868 /* Rajdhani-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rajdhani-Regular.ttf"; sourceTree = "<group>"; };
+		185C692D2FEDACAD00BA3868 /* Rajdhani-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rajdhani-SemiBold.ttf"; sourceTree = "<group>"; };
+		185C692F2FEDACAD00BA3868 /* GroundTrackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroundTrackService.swift; sourceTree = "<group>"; };
+		185C69302FEDACAD00BA3868 /* GroundTrackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroundTrackViewModel.swift; sourceTree = "<group>"; };
+		185C69312FEDACAD00BA3868 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		185C69322FEDACAD00BA3868 /* SatelliteDetailsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatelliteDetailsService.swift; sourceTree = "<group>"; };
+		185C69332FEDACAD00BA3868 /* SatelliteDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatelliteDetailsViewModel.swift; sourceTree = "<group>"; };
+		185C69342FEDACAD00BA3868 /* SatelliteElementsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatelliteElementsService.swift; sourceTree = "<group>"; };
+		185C69352FEDACAD00BA3868 /* SatelliteElementsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatelliteElementsViewModel.swift; sourceTree = "<group>"; };
+		185C69372FEDACAD00BA3868 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		185C69382FEDACAD00BA3868 /* GS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GS.swift; sourceTree = "<group>"; };
+		185C69392FEDACAD00BA3868 /* Homepage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homepage.swift; sourceTree = "<group>"; };
+		185C693A2FEDACAD00BA3868 /* Map3d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map3d.swift; sourceTree = "<group>"; };
+		185C693B2FEDACAD00BA3868 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1817C6B62FBE085A009A4509 /* Exceptions for "SatelliteTracker" folder in "SatelliteTracker" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 1817C6822FBDCB1C009A4509 /* SatelliteTracker */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		1817C6852FBDCB1C009A4509 /* SatelliteTracker */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				1817C6B62FBE085A009A4509 /* Exceptions for "SatelliteTracker" folder in "SatelliteTracker" target */,
-			);
-			path = SatelliteTracker;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		1817C6802FBDCB1C009A4509 /* Frameworks */ = {
@@ -45,8 +91,14 @@
 		1817C67A2FBDCB1C009A4509 = {
 			isa = PBXGroup;
 			children = (
-				1817C6852FBDCB1C009A4509 /* SatelliteTracker */,
+				185C69212FEDACAD00BA3868 /* Components */,
+				185C692E2FEDACAD00BA3868 /* Extensions */,
+				185C69362FEDACAD00BA3868 /* Services */,
+				185C693C2FEDACAD00BA3868 /* Views */,
+				185C68FD2FEDAC8E00BA3868 /* Assets.xcassets */,
 				1817C6842FBDCB1C009A4509 /* Products */,
+				185C68FE2FEDAC8E00BA3868 /* ContentView.swift */,
+				185C69002FEDAC8E00BA3868 /* SatelliteTrackerApp.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,6 +108,63 @@
 				1817C6832FBDCB1C009A4509 /* SatelliteTracker.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		185C69212FEDACAD00BA3868 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				185C691F2FEDACAD00BA3868 /* InputPicker.swift */,
+				185C69202FEDACAD00BA3868 /* TabBar.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		185C692E2FEDACAD00BA3868 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				185C69222FEDACAD00BA3868 /* ColorsCodes.swift */,
+				185C69232FEDACAD00BA3868 /* Electrolize.ttf */,
+				185C69242FEDACAD00BA3868 /* Eunomia-Bold.otf */,
+				185C69252FEDACAD00BA3868 /* Eunomia-Light.otf */,
+				185C69262FEDACAD00BA3868 /* Eunomia-Regular.otf */,
+				185C69272FEDACAD00BA3868 /* FontTypes.swift */,
+				185C69282FEDACAD00BA3868 /* Playfair.ttf */,
+				185C69292FEDACAD00BA3868 /* Rajdhani-Bold.ttf */,
+				185C692A2FEDACAD00BA3868 /* Rajdhani-Light.ttf */,
+				185C692B2FEDACAD00BA3868 /* Rajdhani-Medium.ttf */,
+				185C692C2FEDACAD00BA3868 /* Rajdhani-Regular.ttf */,
+				185C692D2FEDACAD00BA3868 /* Rajdhani-SemiBold.ttf */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		185C69362FEDACAD00BA3868 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				185C692F2FEDACAD00BA3868 /* GroundTrackService.swift */,
+				185C69302FEDACAD00BA3868 /* GroundTrackViewModel.swift */,
+				185C69312FEDACAD00BA3868 /* Models.swift */,
+				1823A8432FFE9F4700EB5230 /* SavedSatellites.swift */,
+				1823A8452FFE9FFD00EB5230 /* UserDefaultFavouritesStore.swift */,
+				1823A8472FFEA17100EB5230 /* FavouritesStore.swift */,
+				185C69322FEDACAD00BA3868 /* SatelliteDetailsService.swift */,
+				185C69332FEDACAD00BA3868 /* SatelliteDetailsViewModel.swift */,
+				185C69342FEDACAD00BA3868 /* SatelliteElementsService.swift */,
+				185C69352FEDACAD00BA3868 /* SatelliteElementsViewModel.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		185C693C2FEDACAD00BA3868 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				185C69372FEDACAD00BA3868 /* Alert.swift */,
+				185C69382FEDACAD00BA3868 /* GS.swift */,
+				185C69392FEDACAD00BA3868 /* Homepage.swift */,
+				185C693A2FEDACAD00BA3868 /* Map3d.swift */,
+				185C693B2FEDACAD00BA3868 /* Settings.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,9 +181,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				1817C6852FBDCB1C009A4509 /* SatelliteTracker */,
 			);
 			name = SatelliteTracker;
 			packageProductDependencies = (
@@ -122,6 +228,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				185C693D2FEDACAD00BA3868 /* Rajdhani-SemiBold.ttf in Resources */,
+				185C693E2FEDACAD00BA3868 /* Playfair.ttf in Resources */,
+				185C693F2FEDACAD00BA3868 /* Eunomia-Light.otf in Resources */,
+				185C69402FEDACAD00BA3868 /* Eunomia-Bold.otf in Resources */,
+				185C69412FEDACAD00BA3868 /* Rajdhani-Medium.ttf in Resources */,
+				185C69422FEDACAD00BA3868 /* Electrolize.ttf in Resources */,
+				185C69432FEDACAD00BA3868 /* Rajdhani-Bold.ttf in Resources */,
+				185C69442FEDACAD00BA3868 /* Rajdhani-Light.ttf in Resources */,
+				185C69452FEDACAD00BA3868 /* Eunomia-Regular.otf in Resources */,
+				185C69462FEDACAD00BA3868 /* Rajdhani-Regular.ttf in Resources */,
+				185C690B2FEDAC8E00BA3868 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +249,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1823A8462FFEA00800EB5230 /* UserDefaultFavouritesStore.swift in Sources */,
+				185C69472FEDACAD00BA3868 /* FontTypes.swift in Sources */,
+				185C69482FEDACAD00BA3868 /* GS.swift in Sources */,
+				1823A8482FFEA18800EB5230 /* FavouritesStore.swift in Sources */,
+				185C69492FEDACAD00BA3868 /* SatelliteDetailsService.swift in Sources */,
+				185C694A2FEDACAD00BA3868 /* GroundTrackViewModel.swift in Sources */,
+				185C694B2FEDACAD00BA3868 /* GroundTrackService.swift in Sources */,
+				185C694C2FEDACAD00BA3868 /* SatelliteElementsService.swift in Sources */,
+				185C694D2FEDACAD00BA3868 /* SatelliteElementsViewModel.swift in Sources */,
+				185C694E2FEDACAD00BA3868 /* SatelliteDetailsViewModel.swift in Sources */,
+				185C694F2FEDACAD00BA3868 /* Homepage.swift in Sources */,
+				1823A8442FFE9F4C00EB5230 /* SavedSatellites.swift in Sources */,
+				185C69502FEDACAD00BA3868 /* Alert.swift in Sources */,
+				185C69512FEDACAD00BA3868 /* Models.swift in Sources */,
+				185C69522FEDACAD00BA3868 /* Settings.swift in Sources */,
+				185C69532FEDACAD00BA3868 /* Map3d.swift in Sources */,
+				185C69542FEDACAD00BA3868 /* InputPicker.swift in Sources */,
+				185C69552FEDACAD00BA3868 /* TabBar.swift in Sources */,
+				185C69562FEDACAD00BA3868 /* ColorsCodes.swift in Sources */,
+				185C691D2FEDAC8E00BA3868 /* ContentView.swift in Sources */,
+				185C691E2FEDAC8E00BA3868 /* SatelliteTrackerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,6 +329,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"INFOPLIST_FILE[sdk=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -269,7 +408,7 @@
 				DEVELOPMENT_TEAM = KA3YZC66RT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SatelliteTracker/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -302,7 +441,7 @@
 				DEVELOPMENT_TEAM = KA3YZC66RT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = SatelliteTracker/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

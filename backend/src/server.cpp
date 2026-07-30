@@ -48,7 +48,7 @@ int main() {
 
     svr.Post("/groundtrack/name", [](const httplib::Request& req, httplib::Response& res) {
         auto body = nlohmann::json::parse(req.body);
-
+       
         // Input type: Satellite Name (already parsed with spaces removed)
         std::string satName = body["name"].get<std::string>();
 
@@ -150,14 +150,22 @@ int main() {
 
     svr.Post("/groundtrack/default", [](const httplib::Request& req, httplib::Response& res) {
         auto body = nlohmann::json::parse(req.body);
-
+    
         // Celestrak URL using NAME as research
         std::string urlName = "/NORAD/elements/gp.php?NAME=" + body["satellite"].get<std::string>() + "&FORMAT=tle";
 
         // Fetch TLE from Celestrak client
         httplib::Client cli("http://celestrak.org");
+        cli.set_interface("utun7");
         auto cliRes = cli.Get(urlName);
         auto rawTle = cliRes->body;
+
+        // if (!cliRes || cliRes->status != 200) {
+        //     res.status = 500;
+        //     res.set_content("Failed to fetch TLE from Celestrak", "text/plain");
+        //     return;
+        // }
+        // auto rawTle = cliRes->body;
 
         // Fetch other inputs and parse TLE from Celestrak
         Tle tle;
