@@ -7,8 +7,8 @@
 
 # INITIAL VARIABLES
 # rebuild=false
-# building_dir="./build/"
-# project="SatelliteTracker"
+building_dir="./build/"
+project="SatelliteTracker"
 
 # # INITIALISE CMAKELISTS FILE AND ITS HASHFILE PATH
 # file="CMakeLists.txt"
@@ -45,14 +45,14 @@
 # COMMON CODE FOR BOTH CASES
 # cd .
 # cmake --build "$building_dir"
-# cd "$building_dir"
-# ./"$project"
+cd "$building_dir"
+./"$project"
 
 ==========
 
 # NEED TO BE IN THE BUILD DIRECTORY
-make
-./SatelliteTracker
+# make
+# ./SatelliteTracker
 
 # If changes in CMakeList.txt then:
 # cmake ..
