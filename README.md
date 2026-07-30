@@ -21,11 +21,7 @@ Full-Stack application using C++ and Swift for the backend and mainly SwiftUI fo
 ### v 01
 Download the first available demo [here](https://github.com/fedespace/SatelliteTrackerCpp/releases/tag/assets).
 
-
 https://github.com/user-attachments/assets/ffe9757c-216a-4095-b1ed-cf16f9ada5c2
-
-
-
 
 ---
 
