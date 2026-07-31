@@ -1,13 +1,22 @@
 #include "FrameTransforms.h"
 #include <cmath>
 
+<<<<<<< HEAD
 Matrix3x3 rotation_teme2ecef(double angle) {
+=======
+Matrix3x3 rotationMatrixZ(double angle) {
+>>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
     double cos = std::cos(angle);
     double sin = std::sin(angle);
 
     return {{
+<<<<<<< HEAD
         {cos, sin, 0.0},
         {-sin, cos, 0.0},
+=======
+        {cos, -sin, 0.0},
+        {sin, cos, 0.0},
+>>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
         {0.0, 0.0, 1.0}
     }};
 };

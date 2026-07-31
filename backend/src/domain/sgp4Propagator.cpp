@@ -60,7 +60,11 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
         );
         double jd_full = jd + jdfrac;
         double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
+<<<<<<< HEAD
         Matrix3x3 R = rotation_teme2ecef(gstime);
+=======
+        Matrix3x3 R = rotationMatrixZ(gstime);
+>>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
         Vector3D r_teme = {r[0], r[1], r[2]};
         Vector3D r_ecef = rotateZ(R, r_teme);
         ecef2ll(r_ecef, radius_earth, lat, lon);
