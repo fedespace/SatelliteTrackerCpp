@@ -73,12 +73,13 @@ TleParam parseTLE(Tle tle) {
     std::memcpy(satn.data(), satnArray, 6);
     double epoch = jd(tle);
     double dragInt = std::stod(tle.line1.substr(54, 5)) * 0.00001;
+    int dragSign = (tle.line1.substr(53, 1) == "-") ? -1 : 1;
     int divide = std::stoi(tle.line1.substr(60, 1));
-    double bstar = -dragInt / pow(10, divide); // drag coefficient
+    double bstar = (dragInt / pow(10, divide)) * dragSign; // drag coefficient
     std::string ndotSign = tle.line1.substr(33, 1) + "0.";
     std::string ndotString = ndotSign + tle.line1.substr(35, 8);
-    // Converting rev to rad using 2*π and day to min using 1440.0, dividing by 2 for how equations are made
-    double ndot = std::stod(ndotString) * M_PI / (1440.0 * 1440.0); 
+    // Converting rev to rad using 2*π and day to min using 1440.0
+    double ndot = std::stod(ndotString) * 2*M_PI / (1440.0 * 1440.0); 
     double nddot = 0.0;
     double ecco = std::stod(tle.line2.substr(26, 7)) * 0.0000001; // eccentricity
     double argpo = std::stod(tle.line2.substr(34, 8)) * M_PI / 180.0; // arg of per [rad]

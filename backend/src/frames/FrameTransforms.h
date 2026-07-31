@@ -14,7 +14,7 @@ struct Matrix3x3 {
 };
 
 // Creation of the rotation matrix around Z-axis
-Matrix3x3 rotationMatrixZ(double angle);
+Matrix3x3 rotation_teme2ecef(double angle);
 
 // Performing the matrix-vector product
 Vector3D rotateZ(const Matrix3x3 R, const Vector3D v);

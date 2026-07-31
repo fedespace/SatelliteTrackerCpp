@@ -1,13 +1,13 @@
 #include "FrameTransforms.h"
 #include <cmath>
 
-Matrix3x3 rotationMatrixZ(double angle) {
+Matrix3x3 rotation_teme2ecef(double angle) {
     double cos = std::cos(angle);
     double sin = std::sin(angle);
 
     return {{
-        {cos, -sin, 0.0},
-        {sin, cos, 0.0},
+        {cos, sin, 0.0},
+        {-sin, cos, 0.0},
         {0.0, 0.0, 1.0}
     }};
 };
