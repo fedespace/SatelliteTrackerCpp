@@ -13,21 +13,13 @@ find_package(ROOT REQUIRED COMPONENTS Graf Core RIO Hist Gpad)
 
 # These are files called by the executable with this name. More executables can be created with different names and called.
 add_executable(SatelliteTracker 
-<<<<<<< HEAD
     src/main.cpp # - removing this for now as everything is in server.cpp
     #src/server.cpp
-=======
-    # src/main.cpp - removing this for now as everything is in server.cpp
-    src/server.cpp
->>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
     src/domain/TimeUtils.cpp
     src/domain/Tle.cpp
     src/frames/FrameTransforms.cpp
     src/domain/sgp4Propagator.cpp
-<<<<<<< HEAD
     src/domain/PassPrediction.cpp
-=======
->>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
 )
 
 # SGP4 is its own library

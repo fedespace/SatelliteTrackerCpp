@@ -62,11 +62,7 @@ void validate(const TimeUTC& time) {
 
 // === VALIDATED =================
 double jd(Tle tle){
-<<<<<<< HEAD
     // Definition from Vallado's sgp4init: days from Jan 0, 1950 00:00:00 -> Jan 1st is "1"
-=======
-    // Definition from Vallado's sgp4init: days from 1st Jan 1950 00:00:00
->>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
 
     int year2digits = std::stoi(tle.line1.substr(18,2));
     int year;
@@ -87,11 +83,7 @@ double jd(Tle tle){
 
     // Compute days and fraction of days
     double jd; // [days]
-<<<<<<< HEAD
     jd = (year - 1950) * 365.0 + dayOfYear + leapDays; // start counting from 0 on 1st Jan, not 1
-=======
-    jd = (year - 1950) * 365.0 + dayOfYear + leapDays - 1.0; // start counting from 0 on 1st Jan, not 1
->>>>>>> 2e26dd290322a0e1236dc4ef8338d945021d8130
 
     return jd; // [days]
 }
