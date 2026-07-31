@@ -52,8 +52,7 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
     // While loop for the propagation and grountrack
     while (tsince <= finalDelta && tsince < maxDT_min) {
         SGP4Funcs::sgp4(satrec, tsince, r, v);
-        double time = time_TLE_min + tsince; // [min]
-        TimeUTC time_c = MJD20002epoch(time); // [year, month, day, hour, minute, seconds]
+        TimeUTC time_c = MJD20002epoch(tsince+time_TLE_min); // [year, month, day, hour, minute, seconds]
         SGP4Funcs::jday_SGP4(
             time_c.year, time_c.month, time_c.day, time_c.hour, time_c.minute, time_c.second,
             jd, jdfrac

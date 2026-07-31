@@ -184,6 +184,9 @@ TimeUTC MJD20002epoch(double mjd_date) {
 
     double dayFrac = rem / 1440.0;
     int day = int(dayFrac);
+    if (day < 10) {
+        day = std::stoi("0"+std::to_string(day));
+    }
 
     // Defining the vector of days per month
     std::vector<int> dayInAMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -209,6 +212,7 @@ TimeUTC MJD20002epoch(double mjd_date) {
     
     remS -= hour * 3600.0;
     int minute = remS / 60.0;
+
     double seconds = remS - minute * 60.0;
 
     return {year, month, day, hour, minute, seconds};
@@ -216,11 +220,17 @@ TimeUTC MJD20002epoch(double mjd_date) {
 
 // Conversion from TimeUTC to String
 std::string to_iso8601(TimeUTC time) {
-    char buf[32];
+    char buf[100];
     std::snprintf(buf, sizeof(buf),
         "%04d-%02d-%02dT%02d:%02d:%06.3fZ",
         time.year, time.month, time.day, time.hour, time.minute, time.second);
     return buf;
+}
+
+std::string time2string(TimeUTC time) {
+    std::string timeStringDate = std::to_string(time.year) + "-" + std::to_string(time.month) + "-" + std::to_string(time.day) + " ";
+    std::string timeStringTiming = std::to_string(time.hour) + ":" + std::to_string(time.minute) + ":" + std::to_string(time.second);
+    return timeStringDate + timeStringTiming;
 }
 
 TimeUTC string2time(std::string timeString) {
