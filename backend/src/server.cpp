@@ -160,13 +160,6 @@ int main() {
         auto cliRes = cli.Get(urlName);
         auto rawTle = cliRes->body;
 
-        // if (!cliRes || cliRes->status != 200) {
-        //     res.status = 500;
-        //     res.set_content("Failed to fetch TLE from Celestrak", "text/plain");
-        //     return;
-        // }
-        // auto rawTle = cliRes->body;
-
         // Fetch other inputs and parse TLE from Celestrak
         Tle tle;
         std::istringstream stream(rawTle);
@@ -202,6 +195,11 @@ int main() {
         nlohmann::json result = serialize_gt(gt);
 
         res.set_content(result.dump(), "application/json");
+
+    });
+
+    svr.Post("/gs/passes", [](const httplib::Request& req, httplib::Response& res) {
+        auto body = nlohmann::json::parse(req.body);
 
     });
 

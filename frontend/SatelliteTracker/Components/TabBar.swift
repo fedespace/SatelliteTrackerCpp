@@ -24,7 +24,7 @@ struct TabBar: View {
             
             // GS functionalities view
             Tab("", systemImage: "antenna.radiowaves.left.and.right.circle") {
-                    GS()
+                    GS(satellite: .constant("ISS (ZARYA)"), startTime: .constant(Date.now), endTime: .constant(Date.now))
                 }
             
             // Setup alerts/notifications view

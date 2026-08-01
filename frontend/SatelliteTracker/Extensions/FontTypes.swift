@@ -44,5 +44,10 @@ extension Font {
     
     // Subtitle details body
     static let subtitleDetail = Font.custom("Electrolize", size: 22)
+    
+    // GS
+    static let gsTitle = Font.custom("Rajdhani-Regular", size: 25)
+    static let gsWindow = Font.custom("Rajdhani-Regular", size: 20)
+    static let coord = Font.custom("Rajdhani-Regular", size: 18)
 }
 

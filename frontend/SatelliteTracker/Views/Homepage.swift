@@ -43,6 +43,7 @@ struct Homepage: View {
     var a: Double {Double((apogee + perigee)/2 + 6371)}
     @State private var selectedCoordinate = CLLocationCoordinate2D()
     @FocusState private var isTextFocused: Bool
+    @State private var satellite: String = ""
     
     
     var body: some View {
@@ -74,7 +75,9 @@ struct Homepage: View {
                                     endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                     if (endTime > startTime) {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                        satellite = noradID
                                     }
+                                    
                                 }
                                 showDetails = true
                             }
@@ -98,6 +101,7 @@ struct Homepage: View {
                                      endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                      if (endTime > startTime) {
                                          await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                         satellite = noradID
                                      }
                                  }
                                  showDetails = true
@@ -148,6 +152,7 @@ struct Homepage: View {
                                             endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                             if (endTime > startTime) {
                                                 await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                satellite = noradID
                                             }
                                         }
                                         showDetails = true
@@ -177,6 +182,7 @@ struct Homepage: View {
                                         Task {
                                             if (endTime > startTime) {
                                                 await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                satellite = noradID
                                             }
                                         }
                                         showDetails = true
@@ -230,6 +236,7 @@ struct Homepage: View {
                                             Task {
                                                 if (endTime > startTime) {
                                                     await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                    satellite = noradID
                                                 }
                                             }
                                             showDetails = true
@@ -255,6 +262,7 @@ struct Homepage: View {
                                             Task {
                                                 if (endTime > startTime) {
                                                     await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                    satellite = noradID
                                                 }
                                             }
                                             showDetails = true
