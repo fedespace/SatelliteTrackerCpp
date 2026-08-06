@@ -49,5 +49,7 @@ extension Font {
     static let gsTitle = Font.custom("Rajdhani-Regular", size: 25)
     static let gsWindow = Font.custom("Rajdhani-Regular", size: 20)
     static let coord = Font.custom("Rajdhani-Regular", size: 18)
+    static let pass = Font.custom("Electrolize", size: 20)
+    static let fetchPass = Font.custom("Electrolize", size: 17)
 }
 

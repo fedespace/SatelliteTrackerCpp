@@ -25,6 +25,7 @@ struct GroundTrackService {
         // Initialise the TLE structure and formatter for dates
         var tle = TleRequest()
         let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "UTC")!
         let startFormatted = formatter.string(from: start)
         let endFormatted = formatter.string(from: end)
         

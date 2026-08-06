@@ -11,11 +11,11 @@ import MapKit
 // Homepage structure
 struct Homepage: View {
     
-    @State private var inputType: InputOptions? = InputOptions.name
+    @State var inputType: InputOptions? = .name
     @State private var searchItem: String = ""
     @State private var gtViewModel = GroundTrackViewModel()
-    @State private var startTime = Date()
-    @State private var endTime = Date()
+    @Binding var startTime: Date
+    @Binding var endTime: Date
     @State private var showEndTime = false
     @State private var step: String = ""
     @State private var showDetails: Bool = false
@@ -43,7 +43,7 @@ struct Homepage: View {
     var a: Double {Double((apogee + perigee)/2 + 6371)}
     @State private var selectedCoordinate = CLLocationCoordinate2D()
     @FocusState private var isTextFocused: Bool
-    @State private var satellite: String = ""
+    @Binding var sat: String
     
     
     var body: some View {
@@ -75,7 +75,7 @@ struct Homepage: View {
                                     endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                     if (endTime > startTime) {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                        satellite = noradID
+                                        sat = noradID
                                     }
                                     
                                 }
@@ -101,7 +101,7 @@ struct Homepage: View {
                                      endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                      if (endTime > startTime) {
                                          await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                         satellite = noradID
+                                         sat = noradID
                                      }
                                  }
                                  showDetails = true
@@ -144,6 +144,7 @@ struct Homepage: View {
                             }
                             .overlay {
                                 DatePicker("", selection: $startTime, displayedComponents: [.date, .hourAndMinute])
+                                    
                                     .colorMultiply(Color.clear)
                                     .accentColor(Color.darkSlateGrey)
                                     .font(.system(size: 20))
@@ -152,7 +153,7 @@ struct Homepage: View {
                                             endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                             if (endTime > startTime) {
                                                 await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                                satellite = noradID
+                                                sat = noradID
                                             }
                                         }
                                         showDetails = true
@@ -182,7 +183,7 @@ struct Homepage: View {
                                         Task {
                                             if (endTime > startTime) {
                                                 await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                                satellite = noradID
+                                                sat = noradID
                                             }
                                         }
                                         showDetails = true
@@ -236,7 +237,7 @@ struct Homepage: View {
                                             Task {
                                                 if (endTime > startTime) {
                                                     await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                                    satellite = noradID
+                                                    sat = noradID
                                                 }
                                             }
                                             showDetails = true
@@ -262,7 +263,7 @@ struct Homepage: View {
                                             Task {
                                                 if (endTime > startTime) {
                                                     await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
-                                                    satellite = noradID
+                                                    sat = noradID
                                                 }
                                             }
                                             showDetails = true
@@ -408,7 +409,3 @@ struct Homepage: View {
     
 }
    
-
-#Preview {
-    Homepage()
-}

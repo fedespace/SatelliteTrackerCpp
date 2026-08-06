@@ -29,13 +29,13 @@ void ecef2ll(Vector3D r, double rE, double& lat, double& lon) {
     // Definition of var for iteration
     double p = std::sqrt(r.x*r.x + r.y*r.y); // distance from Earth's rotation axis
     double lat_0 = atan2(r.z, p);
-    lat = lat_0 + 10000;
+    lat = lat_0;
     double earth_ecc_squared = 0.006694385;
 
     // Loop
     while (std::abs(lat - lat_0) > 1e-10) {
         lat_0 = lat;
-        double N = rE / (std::sqrt(1 - earth_ecc_squared * std::pow(std::sin(lat),2)));
+        double N = rE / (std::sqrt(1 - earth_ecc_squared * std::pow(std::sin(lat_0),2)));
         lat = std::atan2(r.z + earth_ecc_squared * N * std::sin(lat), p);
     }
 

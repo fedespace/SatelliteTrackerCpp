@@ -184,9 +184,6 @@ TimeUTC MJD20002epoch(double mjd_date) {
 
     double dayFrac = rem / 1440.0;
     int day = int(dayFrac);
-    if (day < 10) {
-        day = std::stoi("0"+std::to_string(day));
-    }
 
     // Defining the vector of days per month
     std::vector<int> dayInAMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};

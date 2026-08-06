@@ -51,14 +51,17 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
 
     // While loop for the propagation and grountrack
     while (tsince <= finalDelta && tsince < maxDT_min) {
-        SGP4Funcs::sgp4(satrec, tsince, r, v);
-        TimeUTC time_c = MJD20002epoch(tsince+time_TLE_min); // [year, month, day, hour, minute, seconds]
+        SGP4Funcs::sgp4(satrec, tsince, r, v); // r is in [km]
+        TimeUTC time_c = MJD20002epoch(tsince + time_TLE_min); // [year, month, day, hour, minute, seconds]
+
         SGP4Funcs::jday_SGP4(
             time_c.year, time_c.month, time_c.day, time_c.hour, time_c.minute, time_c.second,
             jd, jdfrac
         );
         double jd_full = jd + jdfrac;
+
         double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
+
         Matrix3x3 R = rotation_teme2ecef(gstime);
         Vector3D r_teme = {r[0], r[1], r[2]};
         Vector3D r_ecef = rotateZ(R, r_teme);

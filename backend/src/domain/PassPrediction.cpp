@@ -99,12 +99,14 @@ Vector3D r_ENU(double locationLat, double locationLon, Vector3D r1, Vector3D r2)
 
     double e = -std::sin(lonRad)*range.x + std::cos(lonRad)*range.y;
     double n = -std::sin(latRad)*std::cos(lonRad)*range.x - std::sin(latRad)*std::sin(lonRad)*range.y + std::cos(latRad)*range.z;
-    double u = std::cos(latRad)*std::cos(lonRad)*range.x - std::cos(latRad)*std::sin(lonRad)*range.y + std::sin(latRad)*range.z;
+    double u = std::cos(latRad)*std::cos(lonRad)*range.x + std::cos(latRad)*std::sin(lonRad)*range.y + std::sin(latRad)*range.z;
+
 
     Vector3D r;
     r.x = e;
     r.y = n;
     r.z = u;
+
     
     return r;
 }
@@ -119,6 +121,7 @@ std::vector<double> ENU2ElAz(Vector3D r_enu) {
 }
 
 std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, double lat, double lon, double alt, double elevationMask, double step) {
+    // Inputs: time [UTC], coordinate [deg, m], step [s]
     
     // Get ECEF vector for GS
     Vector3D gs_ecef = r_gs(lat, lon, alt);
@@ -148,55 +151,38 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     double timeS_min = epoch2mins(tstart);
     double timeE_min = epoch2mins(tend);
     double tsince = timeS_min - time_TLE_min; // start value of the tsince
-    double radius_earth = satrec.radiusearthkm;
     double finalDelta = timeE_min - time_TLE_min;
 
     // Initialise variables
     double r[3], v[3];
     double jd, jdfrac;
 
-    // Initialize elevation @ tstart
-    SGP4Funcs::sgp4(satrec, tsince, r, v);
-    SGP4Funcs::jday_SGP4(
-        tstart.year, tstart.month, tstart.day, tstart.hour, tstart.minute, tstart.second,
-        jd, jdfrac
-    );
-    double jd_full = jd + jdfrac;
-    double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
-    Matrix3x3 R = rotation_teme2ecef(gstime);
-    Vector3D r_teme = {r[0], r[1], r[2]};
-    Vector3D r_ecef = rotateZ(R, r_teme);
-    Vector3D r_ecef_m;
-    r_ecef_m.x = r_ecef.x * 1000.0;
-    r_ecef_m.y = r_ecef.y * 1000.0;
-    r_ecef_m.z = r_ecef.z * 1000.0;
-
-    Vector3D r_enu = r_ENU(lat, lon, r_ecef_m, gs_ecef);
-    double elevation_old = ENU2ElAz(r_enu)[0]; // this is at initial step to use as a comparison
-
-
     // Initialize structure that will be returned.
     std::vector<WindowElevation> window;
 
     // While loop for the propagation and grountrack
     while (tsince <= finalDelta) {
-        SGP4Funcs::sgp4(satrec, tsince, r, v);
-        TimeUTC time_c = MJD20002epoch(tsince+time_TLE_min); // [year, month, day, hour, minute, seconds]
+        SGP4Funcs::sgp4(satrec, tsince, r, v); // r is in [km]
+        TimeUTC time_c = MJD20002epoch(tsince + time_TLE_min); // [year, month, day, hour, minute, seconds]
+
         SGP4Funcs::jday_SGP4(
             time_c.year, time_c.month, time_c.day, time_c.hour, time_c.minute, time_c.second,
             jd, jdfrac
         );
         double jd_full = jd + jdfrac;
+
         double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
+
         Matrix3x3 R = rotation_teme2ecef(gstime);
         Vector3D r_teme = {r[0], r[1], r[2]};
-        Vector3D r_ecef = rotateZ(R, r_teme);
-        Vector3D r_ecef_m;
+        Vector3D r_ecef = rotateZ(R, r_teme); // [km]
+        Vector3D r_ecef_m; // [m]
         r_ecef_m.x = r_ecef.x * 1000.0;
         r_ecef_m.y = r_ecef.y * 1000.0;
         r_ecef_m.z = r_ecef.z * 1000.0;
 
         Vector3D r_enu = r_ENU(lat, lon, r_ecef_m, gs_ecef);
+
         double elevation = ENU2ElAz(r_enu)[0];
 
         WindowElevation singlePoint = {time_c, elevation};
@@ -209,20 +195,25 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     std::vector<PassPrediction> prediction;
     bool pass = false;
     double max_elevation;
-    PassPrediction singlePass;
+    PassPrediction singlePass = {};
+    double e_old = 0;
+
+    int index = 0;
     
     for(int iter = 1; iter < window.size(); iter++) {
 
         double e = window[iter].elevation;
         TimeUTC t = window[iter].time;
-        double e_old = window[iter-1].elevation;
 
-        if (!pass && e >= elevationMask && e_old < elevationMask) {
+        //std::cout << "P? " << pass << ", e(-1): " << e_old << ", e: " << e << ", mask:" << elevationMask << ", time: " << time2string(t) << "\n";
+
+        if (!pass && e > elevationMask && e_old < e) {
             // Interpolating
             double frac = ((elevationMask - e_old) / (e - e_old)) * step; // that's usually fractions of seconds if step is low
-            singlePass.AOS = t;
-            singlePass.AOS.second += frac;
+            double t_min = epoch2mins(t) + frac/60.0;
+            singlePass.AOS = MJD20002epoch(t_min);
             pass = true;
+            std::cout << "Crossed with elevation " << e << ", at time " << time2string(singlePass.AOS) << "\n";
         }
 
         // Update max elevation
@@ -230,14 +221,20 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
             singlePass.max_el = e;
         }
 
-        if (pass && e <= elevationMask && e_old > elevationMask) {
+        if (pass && e < elevationMask && e_old > e) {
             double frac = ((elevationMask - e_old) / (e - e_old)) * step;
-            singlePass.LOS = t;
-            singlePass.LOS.second += frac;
+            double t_min = epoch2mins(t) + frac/60.0;
+            singlePass.LOS = MJD20002epoch(t_min);
+            singlePass.id = index;
+            singlePass.duration = epoch2mins(singlePass.LOS) - epoch2mins(singlePass.AOS);
+            index++;
             pass = false;
             prediction.push_back(singlePass);
+            std::cout << "Crossed with elevation " << e << ", at time " << time2string(singlePass.LOS) << "\n";
             singlePass = {};
         }
+
+        e_old = e;
 
     }
 

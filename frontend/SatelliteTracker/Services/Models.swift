@@ -45,6 +45,25 @@ struct ISS_HUBBLE: Codable {
     var stepInterval: String = ""
 }
 
+struct PassRequest: Codable {
+    var satellite: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+    var gsLat: String = ""
+    var gsLon: String = ""
+    var gsAlt: String = ""
+    var gsMask: String = ""
+}
+
+struct Pass: Codable, Identifiable {
+    var id: Int
+    var aos: String = ""
+    var los: String = ""
+    var maxEl: String = ""
+    var duration: String = ""
+    var quality: String = ""
+}
+
 struct SatelliteDetails: Codable {
     var objectName: String
     var objectType: String

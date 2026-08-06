@@ -39,6 +39,8 @@
 		185C69542FEDACAD00BA3868 /* InputPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C691F2FEDACAD00BA3868 /* InputPicker.swift */; };
 		185C69552FEDACAD00BA3868 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69202FEDACAD00BA3868 /* TabBar.swift */; };
 		185C69562FEDACAD00BA3868 /* ColorsCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185C69222FEDACAD00BA3868 /* ColorsCodes.swift */; };
+		18A06CEC301F4648008F0A56 /* PassService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A06CEB301F4643008F0A56 /* PassService.swift */; };
+		18A06CEE301F7EBB008F0A56 /* PassViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A06CED301F7EB2008F0A56 /* PassViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +77,8 @@
 		185C69392FEDACAD00BA3868 /* Homepage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homepage.swift; sourceTree = "<group>"; };
 		185C693A2FEDACAD00BA3868 /* Map3d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map3d.swift; sourceTree = "<group>"; };
 		185C693B2FEDACAD00BA3868 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		18A06CEB301F4643008F0A56 /* PassService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassService.swift; sourceTree = "<group>"; };
+		18A06CED301F7EB2008F0A56 /* PassViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,7 +146,9 @@
 			isa = PBXGroup;
 			children = (
 				185C692F2FEDACAD00BA3868 /* GroundTrackService.swift */,
+				18A06CEB301F4643008F0A56 /* PassService.swift */,
 				185C69302FEDACAD00BA3868 /* GroundTrackViewModel.swift */,
+				18A06CED301F7EB2008F0A56 /* PassViewModel.swift */,
 				185C69312FEDACAD00BA3868 /* Models.swift */,
 				1823A8432FFE9F4700EB5230 /* SavedSatellites.swift */,
 				1823A8452FFE9FFD00EB5230 /* UserDefaultFavouritesStore.swift */,
@@ -254,6 +260,7 @@
 				185C69482FEDACAD00BA3868 /* GS.swift in Sources */,
 				1823A8482FFEA18800EB5230 /* FavouritesStore.swift in Sources */,
 				185C69492FEDACAD00BA3868 /* SatelliteDetailsService.swift in Sources */,
+				18A06CEE301F7EBB008F0A56 /* PassViewModel.swift in Sources */,
 				185C694A2FEDACAD00BA3868 /* GroundTrackViewModel.swift in Sources */,
 				185C694B2FEDACAD00BA3868 /* GroundTrackService.swift in Sources */,
 				185C694C2FEDACAD00BA3868 /* SatelliteElementsService.swift in Sources */,
@@ -267,6 +274,7 @@
 				185C69532FEDACAD00BA3868 /* Map3d.swift in Sources */,
 				185C69542FEDACAD00BA3868 /* InputPicker.swift in Sources */,
 				185C69552FEDACAD00BA3868 /* TabBar.swift in Sources */,
+				18A06CEC301F4648008F0A56 /* PassService.swift in Sources */,
 				185C69562FEDACAD00BA3868 /* ColorsCodes.swift in Sources */,
 				185C691D2FEDAC8E00BA3868 /* ContentView.swift in Sources */,
 				185C691E2FEDAC8E00BA3868 /* SatelliteTrackerApp.swift in Sources */,

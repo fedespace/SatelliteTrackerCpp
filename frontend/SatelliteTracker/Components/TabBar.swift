@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct TabBar: View {
+    
+    @State private var sat: String = ""
+    @State private var startTime = Date()
+    @State private var endTime = Date()
+    
+    
     var body: some View {
         
         TabView {
             
             // Home page (2D Map) view
             Tab("", systemImage: "house") {
-                    Homepage()
+                Homepage(startTime: $startTime, endTime: $endTime, sat: $sat)
             }
             
             // 3D Map view
@@ -24,7 +30,7 @@ struct TabBar: View {
             
             // GS functionalities view
             Tab("", systemImage: "antenna.radiowaves.left.and.right.circle") {
-                    GS(satellite: .constant("ISS (ZARYA)"), startTime: .constant(Date.now), endTime: .constant(Date.now))
+                    GS(satellite: $sat, startTime: $startTime, endTime: $endTime)
                 }
             
             // Setup alerts/notifications view

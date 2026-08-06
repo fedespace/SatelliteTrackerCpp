@@ -9,9 +9,11 @@
 
 // Defining the structure AOS LOS and max_el
 struct PassPrediction {
+    int id;
     TimeUTC AOS;
     TimeUTC LOS;
     double max_el;
+    double duration;
 };
 
 // Entire window
