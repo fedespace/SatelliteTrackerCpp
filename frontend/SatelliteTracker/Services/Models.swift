@@ -55,6 +55,18 @@ struct PassRequest: Codable {
     var gsMask: String = ""
 }
 
+struct PassTLERequest: Codable {
+    var name: String = ""
+    var line1: String = ""
+    var line2: String = ""
+    var startTime: String = ""
+    var endTime: String = ""
+    var gsLat: String = ""
+    var gsLon: String = ""
+    var gsAlt: String = ""
+    var gsMask: String = ""
+}
+
 struct Pass: Codable, Identifiable {
     var id: Int
     var aos: String = ""

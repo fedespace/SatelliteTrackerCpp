@@ -11,8 +11,8 @@ import MapKit
 // Homepage structure
 struct Homepage: View {
     
-    @State var inputType: InputOptions? = .name
-    @State private var searchItem: String = ""
+    @Binding var inputType: InputOptions
+    @Binding var searchItem: String?
     @State private var gtViewModel = GroundTrackViewModel()
     @Binding var startTime: Date
     @Binding var endTime: Date
@@ -74,7 +74,7 @@ struct Homepage: View {
                                     detailsSatellite = SatelliteDetails.empty
                                     endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                     if (endTime > startTime) {
-                                        await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                        await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                         sat = noradID
                                     }
                                     
@@ -86,8 +86,11 @@ struct Homepage: View {
                         GlassEffectContainer {
                             TextField(
                                  "",
-                                 text: $searchItem,
-                                 prompt: Text("Search by \(inputType!.rawValue)...".uppercased()).kerning(2).foregroundStyle(.white.opacity(0.7))
+                                 text: Binding(
+                                    get: { searchItem ?? "" },
+                                    set: { searchItem = $0.isEmpty ? nil : $0 } // Keeps it nil if empty, or updates it
+                                ),
+                                 prompt: Text("Search by \(inputType.rawValue)...".uppercased()).kerning(2).foregroundStyle(.white.opacity(0.7))
                              )
                              .focused($isTextFocused)
                              .foregroundStyle(.white)
@@ -100,7 +103,7 @@ struct Homepage: View {
                                  Task {
                                      endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                      if (endTime > startTime) {
-                                         await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                          sat = noradID
                                      }
                                  }
@@ -152,7 +155,7 @@ struct Homepage: View {
                                         Task {
                                             endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                             if (endTime > startTime) {
-                                                await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                                 sat = noradID
                                             }
                                         }
@@ -182,7 +185,7 @@ struct Homepage: View {
                                         endTime = (showEndTime) ? startTime.addingTimeInterval(60.0) : startTime.addingTimeInterval(1.0)
                                         Task {
                                             if (endTime > startTime) {
-                                                await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                                 sat = noradID
                                             }
                                         }
@@ -236,7 +239,7 @@ struct Homepage: View {
                                         .onChange(of: endTime) {
                                             Task {
                                                 if (endTime > startTime) {
-                                                    await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                    await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                                     sat = noradID
                                                 }
                                             }
@@ -262,7 +265,7 @@ struct Homepage: View {
                                         .onSubmit {
                                             Task {
                                                 if (endTime > startTime) {
-                                                    await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                    await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                                     sat = noradID
                                                 }
                                             }

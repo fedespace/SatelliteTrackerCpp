@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 @Observable
 class PassViewModel {
     var passes: [Pass] = []
@@ -22,10 +23,23 @@ class PassViewModel {
         formatter.timeZone = .current
         return passes.map { formatter.date(from: String($0.los.split(separator: ".0")[0])) }
     }
+    var inputType: InputOptions? = .name
+    var searchItem: String? = ""
     
-    func fetchPasses(satellite: String, startTime: Date, endTime: Date, gsLat: String, gsLon: String, gsAlt: String, gsMask: String) async {
+    
+    func fetchPasses(satellite: String, startTime: Date, endTime: Date, gsLat: String, gsLon: String, gsAlt: String, gsMask: String, inputType: InputOptions, searchItem: String) async {
+        let inputBinding = Binding<InputOptions?>(
+                    get: { self.inputType },
+                    set: { self.inputType = $0 }
+                )
+                
+                let searchBinding = Binding<String?>(
+                    get: { self.searchItem },
+                    set: { self.searchItem = $0 }
+                )
+        let pService = PassService(inputType: inputBinding, searchItem: searchBinding)
         do {
-            passes = try await PassService().fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask)
+            passes = try await pService.fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem)
             print(passes)
         } catch {
             let errorMess = error.localizedDescription

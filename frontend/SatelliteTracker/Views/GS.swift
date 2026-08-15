@@ -12,6 +12,8 @@ struct GS: View {
     @Binding var satellite: String
     @Binding var startTime: Date
     @Binding var endTime: Date
+    @Binding var inputType: InputOptions
+    @Binding var searchItem: String?
     @State var gsLat: String = ""
     @State var gsLon: String = ""
     @State var gsAlt: String = ""
@@ -191,7 +193,7 @@ struct GS: View {
                     .onTapGesture {
                         passes = []
                         Task {
-                            await passModel.fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask)
+                            await passModel.fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
                         }
                     }
                     
@@ -317,5 +319,5 @@ struct GS: View {
 }
 
 #Preview {
-    GS(satellite: .constant("25544"), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)))
+    GS(satellite: .constant("25544"), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)), inputType: .constant(InputOptions.tle), searchItem: .constant(String("")))
 }

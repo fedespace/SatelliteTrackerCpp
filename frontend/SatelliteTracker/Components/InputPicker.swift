@@ -18,8 +18,8 @@ enum InputOptions: String, CaseIterable {
 
 struct InputPicker: View {
     
-    @Binding var inputType: InputOptions?
-    @Binding var searchItem: String
+    @Binding var inputType: InputOptions
+    @Binding var searchItem: String?
     @Binding var detailsSatellite: SatelliteDetails
     @Binding var endTime: Date
     @Binding var startTime: Date
@@ -54,11 +54,10 @@ struct InputPicker: View {
                     ForEach(defaultInputArray, id: \.self) { option in
                         Text(option.rawValue.uppercased())
                             .onTapGesture {
-                                inputType = (inputType == option) ? nil : option
-                            }
+                                inputType = option                            }
                             .animation(.easeInOut(duration: 0.3), value: inputType)
                             .foregroundStyle(
-                                (inputType == nil || inputType == option) ? Color.black : Color.black.opacity(0.2)
+                                (inputType == option) ? Color.black : Color.black.opacity(0.2)
                             )
                             .font(Font.inputPickerFont)
                         
@@ -123,7 +122,7 @@ struct InputPicker: View {
                                                     detailsSatellite = SatelliteDetails.empty
                                                     endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                                     if (endTime > startTime) {
-                                                        await gtViewModel.fetchGroundTrack(inputType: inputType!, searchItem: searchItem.uppercased(), start: startTime, end: endTime, step: step)
+                                                        await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
                                                     }
                                                 }
                                                 showDetails = true
@@ -154,7 +153,7 @@ struct InputPicker: View {
                     Button {
                         withAnimation(.easeInOut(duration: 0.5)) {
                             if saved {
-                                favouritesStore.remove(searchItem: searchItem, input: inputType!)
+                                favouritesStore.remove(searchItem: searchItem!, input: inputType)
                             }
                             else {
                                 if (inputType == InputOptions.name) {
