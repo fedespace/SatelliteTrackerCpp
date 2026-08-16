@@ -216,7 +216,7 @@ int main() {
         TimeUTC start = string2time(startString); // [UTC]
         TimeUTC end = string2time(endString); // [UTC]
 
-        std::vector<PassPrediction> passes = passTimes(tle, start, end, gsLat, gsLat, gsAlt, gsMask, 5.0);
+        std::vector<PassPrediction> passes = passTimes(tle, start, end, gsLat, gsLon, gsAlt, gsMask, 5.0);
 
         std::string aos;
         std::string los;
@@ -279,7 +279,11 @@ int main() {
         double gsAlt = std::stod(body["gsAlt"].get<std::string>());
         double gsMask = std::stod(body["gsMask"].get<std::string>());
 
-        std::vector<PassPrediction> passes = passTimes(tle, start, end, gsLat, gsLat, gsAlt, gsMask, 5.0);
+        std::vector<PassPrediction> passes = passTimes(tle, start, end, gsLat, gsLon, gsAlt, gsMask, 5.0);
+
+        // for(int i = 0; i < passes.size(); i++) {
+        //     std::cout << time2string(passes[0].AOS) << "\n";
+        // }
 
         std::string aos;
         std::string los;

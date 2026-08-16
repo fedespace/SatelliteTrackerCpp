@@ -24,13 +24,6 @@ struct GS: View {
     @State var losDate = Date()
     @State var maxElevation: String = ""
     @State var duration: String = ""
-    static let dateForm: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-M-d H:m:s"
-        formatter.timeZone = TimeZone(identifier: "UTC")!
-        return formatter
-    }()
-    
     
     
     var body: some View {
@@ -206,8 +199,8 @@ struct GS: View {
                 .padding(.vertical, 10)
                 
                 // Passes container
-                 VStack(alignment: .leading, spacing: 20) {
-                        
+                GlassEffectContainer (spacing: 20) {
+                    
                     HStack(spacing: 10) {
                         
                         Image("passes")
@@ -221,92 +214,101 @@ struct GS: View {
                             .foregroundStyle(Color.ivoryMist)
                             .padding(.top, 5)
                         
+                        Spacer()
+                        
                     }
                     
                     
                     // Pass container
-                     ForEach(Array(passModel.passes.enumerated()), id: \.offset) { index, p in
-                         
-                         VStack {
-                             
-                             if (passModel.aosDates[index] != nil) {
-                                 
-                                 
-                                 
-                                 HStack (alignment: .center, spacing: 20){
-                                     
-                                     
-                                     VStack {
-                                         
-                                         
-                                         Text("AOS")
-                                             .font(Font.fetchPass)
-                                             .foregroundStyle(Color.darkSlateGrey)
-                                             .kerning(2)
-                                         Text("\(passModel.aosDates[index]!.formatted(date: .omitted, time: .shortened))")
-                                         //Text("\(p.aos.split(separator: ".0")[0].split(separator: " ")[1])")
-                                     }
-                                     
-                                     VStack {
-                                         Text("LOS")
-                                             .font(Font.fetchPass)
-                                             .foregroundStyle(Color.darkSlateGrey)
-                                             .kerning(2)
-                                         Text("\(passModel.losDates[index]!.formatted(date: .omitted, time: .shortened))")
-                                         //Text("\(p.los.split(separator: ".0")[0].split(separator: " ")[1])")
-                                     }
-                                     
-                                     VStack {
-                                         Text("MAX EL")
-                                             .font(Font.fetchPass)
-                                             .foregroundStyle(Color.darkSlateGrey)
-                                             .kerning(2)
-                                         Text("\(p.maxEl.prefix(5))")
-                                     }
-                                     
-                                     
-                                 }
-                                 .padding(.bottom, 5)
-                                 
-                                 // Duration
-                                 HStack {
-                                     Text("Duration").textCase(.uppercase)
-                                         .font(Font.fetchPass)
-                                         .foregroundStyle(Color.darkSlateGrey)
-                                         .kerning(2)
-                                     
-                                     Spacer()
-                                     
-                                     Text("\(p.duration)")
-                                         .font(Font.fetchPass)
-                                         .foregroundStyle(Color.ivoryMist)
-                                         .kerning(2)
-                                 }
-                                 .padding(.horizontal, 15)
-                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                 
-                                 
-                                 // Quality of Signal
-                                 HStack {
-                                     Text("Quality").textCase(.uppercase)
-                                         .font(Font.fetchPass)
-                                         .foregroundStyle(Color.darkSlateGrey)
-                                         .kerning(2)
-                                     
-                                     Spacer()
-                                     
-                                     Text("percent bar") //da costruire
-                                 }
-                                 .padding(.horizontal, 15)
-                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                 
-                             }
-                         }
-                         .glassEffect(.regular.tint(Color.white.opacity(0.0)), in: .rect(cornerRadius: 18))
-                     }
+                    let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.enumerated())
+                    
+                    ForEach(indexedPasses, id: \.offset) { index, p in
+                        
+                        VStack {
+                            
+                            HStack (alignment: .center, spacing: 20){
+                                
+                                
+                                VStack {
+                                    
+                                    
+                                    Text("AOS")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                        .kerning(2)
+                                    Text("\(passModel.aosLocal[index])")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                }
+                                
+                                VStack {
+                                    Text("LOS")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                        .kerning(2)
+                                    Text("\(passModel.losLocal[index])")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                }
+                                
+                                VStack {
+                                    Text("MAX EL")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                        .kerning(2)
+                                    Text("\(p.maxEl.prefix(5))")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                }
+                                
+                                
+                            }
+                            .padding(.bottom, 5)
+                            
+                            // Duration
+                            HStack {
+                                Text("Duration").textCase(.uppercase)
+                                    .font(Font.fetchPass)
+                                    .fontWeight(.heavy)
+                                    .foregroundStyle(Color.prussianBlue)
+                                    .kerning(2)
+                                
+                                Spacer()
+                                
+                                Text("\(passModel.duration[index])")
+                                    .font(Font.fetchPass)
+                                    .foregroundStyle(Color.prussianBlue)
+                                    .kerning(2)
+                            }
+                            .padding(.horizontal, 15)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            
+                            // Quality of Signal
+                            HStack {
+                                Text("Quality").textCase(.uppercase)
+                                    .font(Font.fetchPass)
+                                    .foregroundStyle(Color.prussianBlue)
+                                    .kerning(2)
+                                
+                                Spacer()
+                                
+                                Text("percent bar") //da costruire
+                            }
+                            .padding(.horizontal, 15)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                        }
+                        .padding(15)
+                        .frame(maxWidth: .infinity)
+                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
+                        .padding(.bottom, 8)
+                        
+                    }
                 }
-                .padding(.vertical, 20)
-                .padding(.horizontal, 10)
+                .padding(.top, 20)
+                .padding(.bottom, 15)
+                .padding(.horizontal, 20)
                 .frame(maxHeight: .infinity)
                 .frame(maxWidth: .infinity)
                 .glassEffect(.clear, in: .rect(cornerRadius: 30))

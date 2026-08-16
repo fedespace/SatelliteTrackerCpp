@@ -210,6 +210,8 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     // Define elevation at the step - 1 for comparison 
     double e_old = window[0].elevation;
 
+    std::cout << lat << " " << lon << " " << elevationMask << "\n";
+
     int index = 0;
     
     for(int iter = 1; iter < window.size(); iter++) {
@@ -219,9 +221,9 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
 
         if (!pass && e > elevationMask && e_old < e) {
             singlePass.AOS = window[iter - 1].time;
+            std::cout << time2string(singlePass.AOS) << "\n";
             singlePass.max_el = e;
             pass = true;
-            std::cout << "AOS: " << time2string(singlePass.AOS) << "\n"; 
         }
 
         // Update max elevation

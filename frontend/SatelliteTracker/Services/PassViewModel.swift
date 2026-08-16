@@ -11,17 +11,34 @@ import SwiftUI
 @Observable
 class PassViewModel {
     var passes: [Pass] = []
-    var aosDates: [Date?] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-M-d H:m:s"
-        formatter.timeZone = .current
-        return passes.map { formatter.date(from: String($0.aos.split(separator: ".0")[0])) }
+    var utcFormatter: DateFormatter {
+        let utcFormatter = DateFormatter()
+        utcFormatter.dateFormat = "yyyy-M-d H:m:s"
+        utcFormatter.timeZone = TimeZone(identifier: "UTC")
+        utcFormatter.locale = Locale(identifier: "en_US_POSIX")
+        return utcFormatter
     }
-    var losDates: [Date?] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-M-d H:m:s"
-        formatter.timeZone = .current
-        return passes.map { formatter.date(from: String($0.los.split(separator: ".0")[0])) }
+    var localFormatter: DateFormatter {
+        let localFormatter = DateFormatter()
+        localFormatter.dateFormat = "HH:mm:ss"
+        localFormatter.timeZone = TimeZone.current
+        return localFormatter
+    }
+    var aosLocal: [String] {
+        var utctime = passes.map { utcFormatter.date(from: String($0.aos.split(separator: ".0")[0])) }
+        return utctime.map {localFormatter.string(from: $0!)}
+    }
+    var losLocal: [String] {
+        var utctime = passes.map { utcFormatter.date(from: String($0.los.split(separator: ".0")[0])) }
+        return utctime.map {localFormatter.string(from: $0!)}
+    }
+    var duration: [String] {
+        passes.compactMap { p in
+            var totalSeconds = Int(Double(p.duration)! * 60)
+            let min = totalSeconds / 60
+            let sec = totalSeconds % 60
+            return String(format: "%dm %ds", min, sec)
+            }
     }
     var inputType: InputOptions? = .name
     var searchItem: String? = ""
