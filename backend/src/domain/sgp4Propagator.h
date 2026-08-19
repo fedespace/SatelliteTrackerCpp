@@ -10,6 +10,8 @@
 
 // Defining the structure of each point on the groundtrack
 struct GroundTrack {
+    std::string line1;
+    std::string line2;
     std::string name;
     std::string norad;
     TimeUTC time;

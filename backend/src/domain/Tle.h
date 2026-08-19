@@ -6,6 +6,8 @@
 #include <array>
 #include "../../external/sgp4/SGP4.h"
 #include <tuple>
+#include "../external/httpLib/httplib.h"
+#include "../external/httpLib/json.hpp"
 
 // ===============================
 
@@ -43,3 +45,5 @@ TleParam parseTLE(Tle tle);
 std::string orbit_type(Tle tle);
 
 std::tuple<int, std::string> max_delta(std::string classification_orbit);
+
+Tle fetchTLE(std::string inputType, std::string input);

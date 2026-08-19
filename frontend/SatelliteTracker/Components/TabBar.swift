@@ -14,6 +14,7 @@ struct TabBar: View {
     @State private var endTime = Date()
     @State private var inputType: InputOptions = .name
     @State private var searchItem: String?
+    @State private var gtViewModel = GroundTrackViewModel()
     
     var body: some View {
         
@@ -21,7 +22,7 @@ struct TabBar: View {
             
             // Home page (2D Map) view
             Tab("", systemImage: "house") {
-                Homepage(inputType: $inputType, searchItem: $searchItem, startTime: $startTime, endTime: $endTime, sat: $sat)
+                Homepage(inputType: $inputType, searchItem: $searchItem, gtViewModel: $gtViewModel, startTime: $startTime, endTime: $endTime, sat: $sat)
             }
             
             // 3D Map view
@@ -31,7 +32,7 @@ struct TabBar: View {
             
             // GS functionalities view
             Tab("", systemImage: "antenna.radiowaves.left.and.right.circle") {
-                    GS(satellite: $sat, startTime: $startTime, endTime: $endTime, inputType: $inputType, searchItem: $searchItem)
+                    GS(satellite: $sat, startTime: $startTime, endTime: $endTime, inputType: $inputType, searchItem: $searchItem, gtViewModel: $gtViewModel)
                 }
             
             // Setup alerts/notifications view

@@ -18,6 +18,13 @@ class GroundTrackViewModel {
         points.sorted { $0.key < $1.key }
               .map { CLLocationCoordinate2D(latitude: $0.value.lat, longitude: $0.value.lon) }
     }
+    var tleLine1: String {
+        points.values.first?.line1 ?? ""
+    }
+    var tleLine2: String {
+        points.values.first?.line2 ?? ""
+    }
+    
     var satName: String = ""
     var norad: String = ""
     

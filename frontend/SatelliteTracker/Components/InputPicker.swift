@@ -12,8 +12,6 @@ enum InputOptions: String, CaseIterable {
     case name
     case norad
     case tle
-    case iss
-    case hubble
 }
 
 struct InputPicker: View {

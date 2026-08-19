@@ -13,7 +13,7 @@ struct Homepage: View {
     
     @Binding var inputType: InputOptions
     @Binding var searchItem: String?
-    @State private var gtViewModel = GroundTrackViewModel()
+    @Binding var gtViewModel: GroundTrackViewModel
     @Binding var startTime: Date
     @Binding var endTime: Date
     @State private var showEndTime = false

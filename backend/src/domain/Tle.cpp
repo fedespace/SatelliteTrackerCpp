@@ -154,3 +154,31 @@ std::tuple<int, std::string> max_delta(std::string classification_orbit) {
     }
     return {maxDT, degrad_degree};
 }
+
+Tle fetchTLE(std::string inputType, std::string input) {
+    
+    std::string urlName;
+    if (inputType == "name") {
+        urlName = "/NORAD/elements/gp.php?NAME=" + input + "&FORMAT=tle";
+    } else if (inputType == "norad") {
+        urlName = "/NORAD/elements/gp.php?CATNR=" + input + "&FORMAT=tle";
+    }
+
+    // Fetch TLE from Celestrak client
+    httplib::Client cli("http://celestrak.org");
+    cli.set_interface("utun7");
+    auto cliRes = cli.Get(urlName);
+    auto rawTle = cliRes->body;
+
+    // Fetch other inputs and parse TLE from Celestrak
+    Tle tle;
+    std::istringstream stream(rawTle);
+    std::getline(stream, tle.name);
+    std::getline(stream, tle.line1);
+    std::getline(stream, tle.line2);
+    tle.name.erase(tle.name.find_last_not_of(" \t\r\n") + 1);
+    tle.line1.erase(tle.line1.find_last_not_of(" \t\r\n") + 1);
+    tle.line2.erase(tle.line2.find_last_not_of(" \t\r\n") + 1);
+
+    return tle;
+}

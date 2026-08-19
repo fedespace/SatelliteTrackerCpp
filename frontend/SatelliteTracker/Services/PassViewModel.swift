@@ -20,21 +20,26 @@ class PassViewModel {
     }
     var localFormatter: DateFormatter {
         let localFormatter = DateFormatter()
-        localFormatter.dateFormat = "HH:mm:ss"
+        localFormatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
         localFormatter.timeZone = TimeZone.current
         return localFormatter
     }
-    var aosLocal: [String] {
-        var utctime = passes.map { utcFormatter.date(from: String($0.aos.split(separator: ".0")[0])) }
-        return utctime.map {localFormatter.string(from: $0!)}
+    var durationFormatter: DateFormatter {
+        let durationFormatter = DateFormatter()
+        durationFormatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
+        return durationFormatter
     }
-    var losLocal: [String] {
-        var utctime = passes.map { utcFormatter.date(from: String($0.los.split(separator: ".0")[0])) }
-        return utctime.map {localFormatter.string(from: $0!)}
-    }
+//    var aosLocal: [String] {
+//        let utctime = passes.map { utcFormatter.date(from: String($0.aos.split(separator: ".0")[0])) }
+//        return utctime.map {localFormatter.string(from: $0!)}
+//    }
+//    var losLocal: [String] {
+//        let utctime = passes.map { utcFormatter.date(from: String($0.los.split(separator: ".0")[0])) }
+//        return utctime.map {localFormatter.string(from: $0!)}
+//    }
     var duration: [String] {
         passes.compactMap { p in
-            var totalSeconds = Int(Double(p.duration)! * 60)
+            let totalSeconds = Int(Double(p.duration)! * 60)
             let min = totalSeconds / 60
             let sec = totalSeconds % 60
             return String(format: "%dm %ds", min, sec)
@@ -44,7 +49,7 @@ class PassViewModel {
     var searchItem: String? = ""
     
     
-    func fetchPasses(satellite: String, startTime: Date, endTime: Date, gsLat: String, gsLon: String, gsAlt: String, gsMask: String, inputType: InputOptions, searchItem: String) async {
+    func fetchPasses(name: String, line1: String, line2: String, startTime: Date, endTime: Date, gsLat: String, gsLon: String, gsAlt: String, gsMask: String, inputType: InputOptions, searchItem: String) async {
         let inputBinding = Binding<InputOptions?>(
                     get: { self.inputType },
                     set: { self.inputType = $0 }
@@ -56,8 +61,7 @@ class PassViewModel {
                 )
         let pService = PassService(inputType: inputBinding, searchItem: searchBinding)
         do {
-            passes = try await pService.fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem)
-            print(passes)
+            passes = try await pService.fetchPasses(name: name, line1: line1, line2: line2, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem)
         } catch {
             let errorMess = error.localizedDescription
             print("Error message: \(errorMess)")

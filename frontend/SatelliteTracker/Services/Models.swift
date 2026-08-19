@@ -9,6 +9,8 @@ import SwiftUI
 
 // Codable: both encodable and decodable (both swift->JSON and JSON->swift)
 struct GroundTrackPoint: Codable {
+    let line1: String
+    let line2: String
     let name: String
     let norad: String
     let lat: Double
@@ -38,24 +40,7 @@ struct NoradRequest: Codable {
     var stepInterval: String = ""
 }
 
-struct ISS_HUBBLE: Codable {
-    var satellite: String = ""
-    var startTime: String = ""
-    var endTime: String = ""
-    var stepInterval: String = ""
-}
-
 struct PassRequest: Codable {
-    var satellite: String = ""
-    var startTime: String = ""
-    var endTime: String = ""
-    var gsLat: String = ""
-    var gsLon: String = ""
-    var gsAlt: String = ""
-    var gsMask: String = ""
-}
-
-struct PassTLERequest: Codable {
     var name: String = ""
     var line1: String = ""
     var line2: String = ""
@@ -75,6 +60,29 @@ struct Pass: Codable, Identifiable {
     var duration: String = ""
     var quality: String = ""
 }
+
+extension Pass {
+    static let empty = Pass(
+        id: 0,
+        aos: "",
+        los: "",
+        maxEl: "",
+        duration: "",
+        quality: ""
+    )
+}
+
+
+extension Pass {
+    static let mockPasses: [Pass] = [
+        Pass(id: 0, aos: "2026-8-16 7:43:10.000000", los: "2026-8-16 7:49:50.000000", maxEl: "78.212110", duration: "6.666667", quality: ""),
+        Pass(id: 1, aos: "2026-8-16 9:19:55.000000", los: "2026-8-16 9:26:35.000000", maxEl: "74.411498", duration: "6.666667", quality: ""),
+        Pass(id: 2, aos: "2026-8-16 11:02:30.000000", los: "2026-8-16 11:10:05.000000", maxEl: "45.100000", duration: "7.583333", quality: "")
+            
+    ]
+}
+
+
 
 struct SatelliteDetails: Codable {
     var objectName: String
@@ -134,6 +142,7 @@ extension SatelliteDetails {
         orbitType: ""
     )
 }
+
 
 let launchSites: [String : String] = [
     "AFETR": "Air Force Eastern Test Range, Florida, USA",

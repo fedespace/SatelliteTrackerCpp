@@ -27,7 +27,7 @@ class UserDefaultFavouritesStore: FavouritesStoring {
     
     func save(_ satellites: [SavedSatellites]) {
         if let encoded = try? JSONEncoder().encode(satellites) {
-            print(encoded)
+            //print(encoded)
             UserDefaults.standard.set(encoded, forKey: key)
         }
     }

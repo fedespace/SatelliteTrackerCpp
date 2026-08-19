@@ -14,17 +14,71 @@ struct GS: View {
     @Binding var endTime: Date
     @Binding var inputType: InputOptions
     @Binding var searchItem: String?
+    @Binding var gtViewModel: GroundTrackViewModel
     @State var gsLat: String = ""
     @State var gsLon: String = ""
     @State var gsAlt: String = ""
     @State var gsMask: String = ""
-    @State var passModel = PassViewModel()
-    @State var passes: [Pass] = []
-    @State var aosDate = Date()
-    @State var losDate = Date()
+    //@State var passModel = PassViewModel()
+    @State var passModel: PassViewModel
     @State var maxElevation: String = ""
     @State var duration: String = ""
+    // To translate the string utc into date utc
+    var utcStringToDate: DateFormatter {
+        let utcStringToDate = DateFormatter()
+        utcStringToDate.dateFormat = "yyyy-M-d H:m:s"
+        utcStringToDate.timeZone = TimeZone(identifier: "UTC")
+        utcStringToDate.locale = Locale(identifier: "en_US_POSIX")
+        return utcStringToDate
+    }
+    // To translate the date utc to formatted string with only time (for displaying in frontend)
+    var utcDateToLocalString: DateFormatter {
+        let utcDateToLocalString = DateFormatter()
+        utcDateToLocalString.dateFormat = "HH:mm:ss"
+        utcDateToLocalString.timeZone = .current
+        return utcDateToLocalString
+    }
+    // To translate the date utc into date string (complete) local
+    var utcDateToCompleteLocalString: DateFormatter {
+        let utcDateToCompleteLocalString = DateFormatter()
+        utcDateToCompleteLocalString.dateFormat = "yyyy-M-d H:m:s"
+        utcDateToCompleteLocalString.timeZone = .current
+        return utcDateToCompleteLocalString
+    }
+    // To translate the complete local string to complete local date
+    var df: DateFormatter {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return df
+    }
+    // To get time before next AOS pass
+    var comp: DateComponentsFormatter {
+        let comp = DateComponentsFormatter()
+        comp.allowedUnits = [.hour, .minute, .second]
+        comp.unitsStyle = .short
+        return comp
+    }
     
+   
+    
+
+    init(
+        satellite: Binding<String>,
+        startTime: Binding<Date>,
+        endTime: Binding<Date>,
+        inputType: Binding<InputOptions>,
+        searchItem: Binding<String?>,
+        passModel: PassViewModel = PassViewModel(),
+        gtViewModel: Binding<GroundTrackViewModel>
+    ) {
+        self._satellite = satellite
+        self._startTime = startTime
+        self._endTime = endTime
+        self._inputType = inputType
+        self._searchItem = searchItem
+        self._passModel = State(initialValue: passModel)
+        self._gtViewModel = gtViewModel
+    }
     
     var body: some View {
         
@@ -184,9 +238,9 @@ struct GS: View {
                     .glassEffect(.regular.tint(Color.darkSlateGrey), in: .rect(cornerRadius: 30))
                     .padding(.top, 5)
                     .onTapGesture {
-                        passes = []
+                        //passes = []
                         Task {
-                            await passModel.fetchPasses(satellite: satellite, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
+                            await passModel.fetchPasses(name: gtViewModel.satName, line1: gtViewModel.tleLine1, line2: gtViewModel.tleLine2, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
                         }
                     }
                     
@@ -218,11 +272,31 @@ struct GS: View {
                         
                     }
                     
+                    // Pass containers
+                    if (passModel.passes.first != nil) {
+                        
+                        let aos_UTCDate = utcStringToDate.date(from: String(passModel.passes.first!.aos.split(separator: ".0")[0]))
+                        let aos_localString = utcDateToCompleteLocalString.string(from: aos_UTCDate!)
+                        let aos_localDate = df.date(from: aos_localString)
+                        let timeToFirstAOS = aos_localDate?.timeIntervalSince(Date.now)
+                        let printedTime = comp.string(from: timeToFirstAOS!)
+                        
+                        VStack {
+                            Text("Next pass in \(String(describing: printedTime!))")
+                        }
+                        
+                    }
                     
-                    // Pass container
+                    
                     let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.enumerated())
                     
                     ForEach(indexedPasses, id: \.offset) { index, p in
+                        
+                        var aosDateUTC = utcStringToDate.date(from: String(p.aos.split(separator: ".0")[0]))
+                        var losDateUTC = utcStringToDate.date(from: String(p.los.split(separator: ".0")[0]))
+                        var aosStringDisplay = utcDateToLocalString.string(from: aosDateUTC!)
+                        var losStringDisplay = utcDateToLocalString.string(from: losDateUTC!)
+                        
                         
                         VStack {
                             
@@ -236,7 +310,7 @@ struct GS: View {
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                         .kerning(2)
-                                    Text("\(passModel.aosLocal[index])")
+                                    Text("\(aosStringDisplay)")
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                 }
@@ -246,7 +320,7 @@ struct GS: View {
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                         .kerning(2)
-                                    Text("\(passModel.losLocal[index])")
+                                    Text("\(losStringDisplay)")
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                 }
@@ -321,5 +395,15 @@ struct GS: View {
 }
 
 #Preview {
-    GS(satellite: .constant("25544"), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)), inputType: .constant(InputOptions.tle), searchItem: .constant(String("")))
+    let mockModel = PassViewModel()
+    let mockGt = GroundTrackViewModel()
+    mockModel.passes = Pass.mockPasses
+    mockGt.points = [
+        "0": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 45.0, lon: -30.0),
+        "1": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 46.2, lon: -25.5),
+        "2": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 47.1, lon: -20.1)
+    ]
+//    mockGt.satName = "ISS (ZARYA)"
+//    mockGt.norad = "25544"
+    return GS(satellite: .constant("25544"), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)), inputType: .constant(InputOptions.tle), searchItem: .constant(String("")), passModel: mockModel, gtViewModel: .constant(mockGt))
 }

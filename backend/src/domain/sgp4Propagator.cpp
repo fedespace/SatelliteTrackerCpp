@@ -68,7 +68,7 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
         ecef2ll(r_ecef, radius_earth, lat, lon);
         lat_vec.push_back(lat);
         lon_vec.push_back(lon);
-        GroundTrack single_point = {tle.name, parameters.satnString, time_c, lat, lon};
+        GroundTrack single_point = {tle.line1, tle.line2, tle.name, parameters.satnString, time_c, lat, lon};
         gt.push_back(single_point);
         
         // Update for the next iteration
@@ -87,6 +87,8 @@ nlohmann::json serialize_gt(std::vector<GroundTrack> gt) {
     for (int i = 0; i < gt.size(); i++) {
         TimeUTC time = gt[i].time;
         std::string time_string = to_iso8601(time);
+        result[time_string]["line1"] = gt[i].line1;
+        result[time_string]["line2"] = gt[i].line2;
         result[time_string]["name"] = gt[i].name;
         result[time_string]["norad"] = gt[i].norad;
         result[time_string]["lat"] = gt[i].lat;
