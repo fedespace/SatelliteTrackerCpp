@@ -38,6 +38,12 @@ struct GS: View {
         utcDateToLocalString.timeZone = .current
         return utcDateToLocalString
     }
+    var utcDateToLocalString_hh_mm: DateFormatter {
+        let utcDateToLocalString_hh_mm = DateFormatter()
+        utcDateToLocalString_hh_mm.dateFormat = "HH:mm"
+        utcDateToLocalString_hh_mm.timeZone = .current
+        return utcDateToLocalString_hh_mm
+    }
     // To translate the date utc into date string (complete) local
     var utcDateToCompleteLocalString: DateFormatter {
         let utcDateToCompleteLocalString = DateFormatter()
@@ -55,9 +61,16 @@ struct GS: View {
     var comp: DateComponentsFormatter {
         let comp = DateComponentsFormatter()
         comp.allowedUnits = [.hour, .minute, .second]
-        comp.unitsStyle = .short
+        comp.unitsStyle = .abbreviated
         return comp
     }
+    // Future passes
+    var futurePass: DateFormatter {
+        let futurePass = DateFormatter()
+        futurePass.dateFormat = "d MMM"
+        return futurePass
+    }
+    
     
    
     
@@ -102,8 +115,8 @@ struct GS: View {
                         
                         
                         Text("\($satellite.wrappedValue)")
-                            .font(Font.gsTitle)
-                            .fontWeight(.bold)
+                            .font(.eunomiaRegular)
+                            .kerning(8)
                             .foregroundStyle(Color.ivoryMist)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -143,8 +156,8 @@ struct GS: View {
                             .padding(.bottom, 8)
                         
                         Text("Ground Station").textCase(.uppercase)
-                            .font(Font.gsTitle)
-                            .fontWeight(.bold)
+                            .font(.eunomiaRegular)
+                            .kerning(8)
                             .foregroundStyle(Color.darkSlateGrey)
                         
                     }
@@ -263,10 +276,10 @@ struct GS: View {
                             .frame(width: 25, height: 25)
                         
                         Text("Passes").textCase(.uppercase)
-                            .font(Font.gsTitle)
-                            .fontWeight(.bold)
+                            //.font(Font.gsTitle)
+                            .font(.eunomiaRegular)
+                            .kerning(8)
                             .foregroundStyle(Color.ivoryMist)
-                            .padding(.top, 5)
                         
                         Spacer()
                         
@@ -278,29 +291,44 @@ struct GS: View {
                         let aos_UTCDate = utcStringToDate.date(from: String(passModel.passes.first!.aos.split(separator: ".0")[0]))
                         let aos_localString = utcDateToCompleteLocalString.string(from: aos_UTCDate!)
                         let aos_localDate = df.date(from: aos_localString)
+                        let los_UTCDate = utcStringToDate.date(from: String(passModel.passes.first!.los.split(separator: ".0")[0]))
+                        let los_localString = utcDateToCompleteLocalString.string(from: los_UTCDate!)
+                        let los_localDate = df.date(from: los_localString)
                         let timeToFirstAOS = aos_localDate?.timeIntervalSince(Date.now)
                         let printedTime = comp.string(from: timeToFirstAOS!)
+                        let totalD = los_localDate?.timeIntervalSince(aos_localDate!)
+                        let durMin = totalD! / 60.rounded(.towardZero)
+                        let durSec = totalD?.truncatingRemainder(dividingBy: 60)
+                        let d = String(format: "%dm %ds", Int(durMin), Int(durSec!))
+                       
+                        let mE = passModel.passes.first?.maxEl
                         
                         VStack {
-                            Text("Next pass in \(String(describing: printedTime!))")
-                        }
-                        
-                    }
-                    
-                    
-                    let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.enumerated())
-                    
-                    ForEach(indexedPasses, id: \.offset) { index, p in
-                        
-                        var aosDateUTC = utcStringToDate.date(from: String(p.aos.split(separator: ".0")[0]))
-                        var losDateUTC = utcStringToDate.date(from: String(p.los.split(separator: ".0")[0]))
-                        var aosStringDisplay = utcDateToLocalString.string(from: aosDateUTC!)
-                        var losStringDisplay = utcDateToLocalString.string(from: losDateUTC!)
-                        
-                        
-                        VStack {
+                            HStack {
+                                RoundedRectangle(cornerRadius: 30)
+                                    .fill(Color.prussianBlue.opacity(0.2))
+                                    .stroke(.gray)
+                                    .overlay(
+                                        Text("Next pass")
+                                            .font(.eunomiaRegular)
+                                            .scaleEffect(y: 0.7)
+                                            .foregroundStyle(Color.darkSlateGrey)
+                                            .kerning(1)
+                                    )
+                                    .frame(width: 105, height: 25)
+                                
+                                Spacer()
+                                
+                                Text("in \(String(describing: printedTime!))")
+                                    .font(.firstPass)
+                                    .foregroundStyle(Color.darkSlateGrey)
+                                    .padding(.top, 5)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.bottom, 6)
+                            .padding(.horizontal, 8)
                             
-                            HStack (alignment: .center, spacing: 20){
+                            HStack (alignment: .center, spacing: 25){
                                 
                                 
                                 VStack {
@@ -310,18 +338,9 @@ struct GS: View {
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                         .kerning(2)
-                                    Text("\(aosStringDisplay)")
-                                        .font(Font.fetchPass)
-                                        .foregroundStyle(Color.prussianBlue)
-                                }
-                                
-                                VStack {
-                                    Text("LOS")
-                                        .font(Font.fetchPass)
-                                        .foregroundStyle(Color.prussianBlue)
-                                        .kerning(2)
-                                    Text("\(losStringDisplay)")
-                                        .font(Font.fetchPass)
+                                    Text("\(utcDateToLocalString.string(from: aos_UTCDate!))")
+                                        .font(Font.passData)
+                                        .kerning(0.5)
                                         .foregroundStyle(Color.prussianBlue)
                                 }
                                 
@@ -330,16 +349,26 @@ struct GS: View {
                                         .font(Font.fetchPass)
                                         .foregroundStyle(Color.prussianBlue)
                                         .kerning(2)
-                                    Text("\(p.maxEl.prefix(5))")
-                                        .font(Font.fetchPass)
+                                    Text("\(mE!.prefix(5))")
+                                        .font(Font.passData)
+                                        .kerning(0.5)
                                         .foregroundStyle(Color.prussianBlue)
                                 }
                                 
-                                
+                                VStack {
+                                    Text("LOS")
+                                        .font(Font.fetchPass)
+                                        .foregroundStyle(Color.prussianBlue)
+                                        .kerning(2)
+                                    Text("\(utcDateToLocalString.string(from: los_UTCDate!))")
+                                        .font(Font.passData)
+                                        .kerning(0.5)
+                                        .foregroundStyle(Color.prussianBlue)
+                                }
                             }
+                            .frame(maxWidth: .infinity)
                             .padding(.bottom, 5)
                             
-                            // Duration
                             HStack {
                                 Text("Duration").textCase(.uppercase)
                                     .font(Font.fetchPass)
@@ -349,7 +378,7 @@ struct GS: View {
                                 
                                 Spacer()
                                 
-                                Text("\(passModel.duration[index])")
+                                Text("\(d)")//"\(durMin)m \(durSec)s")
                                     .font(Font.fetchPass)
                                     .foregroundStyle(Color.prussianBlue)
                                     .kerning(2)
@@ -357,10 +386,8 @@ struct GS: View {
                             .padding(.horizontal, 15)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             
-                            
-                            // Quality of Signal
                             HStack {
-                                Text("Quality").textCase(.uppercase)
+                                Text("QoS")
                                     .font(Font.fetchPass)
                                     .foregroundStyle(Color.prussianBlue)
                                     .kerning(2)
@@ -373,10 +400,158 @@ struct GS: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             
                         }
-                        .padding(15)
                         .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 10)
                         .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
-                        .padding(.bottom, 8)
+                        .padding(.bottom, 7)
+                        
+                        
+                    }
+                    
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(Color.ivoryMist.opacity(0.2))
+                        .stroke(Color.ivoryMist)
+                        .overlay(
+                            Text("Future Passes")
+                                .font(.eunomiaRegular)
+                                .foregroundStyle(Color.ivoryMist)
+                                .kerning(4)
+                                .scaleEffect(y: 0.8)
+                            )
+                        .frame(width: 250, height: 25, alignment: .leading)
+                        .padding(.bottom, 3)
+                    
+                    let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.enumerated())
+                    
+                    ForEach(indexedPasses, id: \.offset) { index, p in
+                        
+                        let aosDateUTC = utcStringToDate.date(from: String(p.aos.split(separator: ".0")[0]))
+                        let losDateUTC = utcStringToDate.date(from: String(p.los.split(separator: ".0")[0]))
+                        let aosStringDisplay = utcDateToLocalString.string(from: aosDateUTC!)
+                        let losStringDisplay = utcDateToLocalString.string(from: losDateUTC!)
+                        let aos_localString = utcDateToCompleteLocalString.string(from: aosDateUTC!)
+                        let aos_localDate = df.date(from: aos_localString)
+                        let los_localString = utcDateToCompleteLocalString.string(from: losDateUTC!)
+                        let los_localDate = df.date(from: los_localString)
+                        let todayBool = Calendar.current.isDateInToday(aos_localDate!)
+                        let tomorrowBool = Calendar.current.isDateInTomorrow(aos_localDate!)
+                        let when = todayBool ? "Today" : (tomorrowBool ? "Tomorrow" : "\(futurePass.string(from: aos_localDate!))")
+                        let futurePassesAOS = utcDateToLocalString_hh_mm.string(from: aosDateUTC!)
+                        let passMin = Int(los_localDate!.timeIntervalSince(aos_localDate!) / 60.rounded(.towardZero))
+                        
+                        
+                        HStack {
+                            
+                            VStack(alignment: .leading, spacing: -3) {
+                                Text("\(when), \(futurePassesAOS)")
+                                    .font(.eunomiaRegular)
+                                    .scaleEffect(y: 0.8)
+                                    .foregroundStyle(Color.darkSlateGrey)
+                                
+                                Text("\(passMin) min · max \(p.maxEl.prefix(2))°")
+                                    .font(.durElev)
+                                    .opacity(0.6)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            RoundedRectangle(cornerRadius: 30)
+                                .fill(.clear)
+                                .stroke(.gray)
+                                .overlay(
+                                    Text("QoS")
+                                        .font(.durElev)
+                                        .foregroundStyle(Color.darkSlateGrey)
+                                    )
+                                .frame(width: 60, height: 25, alignment: .leading)
+                            
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 20)
+                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
+                        .padding(.bottom, 3)
+                        
+                        
+//                        VStack {
+//                            
+//                            
+//                            HStack (alignment: .center, spacing: 20){
+//                                
+//                                
+//                                VStack {
+//                                    
+//                                    
+//                                    Text("AOS")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                        .kerning(2)
+//                                    Text("\(aosStringDisplay)")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                }
+//                                
+//                                VStack {
+//                                    Text("LOS")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                        .kerning(2)
+//                                    Text("\(losStringDisplay)")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                }
+//                                
+//                                VStack {
+//                                    Text("MAX EL")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                        .kerning(2)
+//                                    Text("\(p.maxEl.prefix(5))")
+//                                        .font(Font.fetchPass)
+//                                        .foregroundStyle(Color.prussianBlue)
+//                                }
+//                                
+//                                
+//                            }
+//                            .padding(.bottom, 5)
+//                            
+//                            // Duration
+//                            HStack {
+//                                Text("Duration").textCase(.uppercase)
+//                                    .font(Font.fetchPass)
+//                                    .fontWeight(.heavy)
+//                                    .foregroundStyle(Color.prussianBlue)
+//                                    .kerning(2)
+//                                
+//                                Spacer()
+//                                
+//                                Text("\(passModel.duration[index])")
+//                                    .font(Font.fetchPass)
+//                                    .foregroundStyle(Color.prussianBlue)
+//                                    .kerning(2)
+//                            }
+//                            .padding(.horizontal, 15)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                            
+//                            
+//                            // Quality of Signal
+//                            HStack {
+//                                Text("Quality").textCase(.uppercase)
+//                                    .font(Font.fetchPass)
+//                                    .foregroundStyle(Color.prussianBlue)
+//                                    .kerning(2)
+//                                
+//                                Spacer()
+//                                
+//                                Text("percent bar") //da costruire
+//                            }
+//                            .padding(.horizontal, 15)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                            
+//                        }
+//                        .padding(15)
+//                        .frame(maxWidth: .infinity)
+//                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
+//                        .padding(.bottom, 8)
                         
                     }
                 }
