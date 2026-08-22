@@ -46,9 +46,9 @@ extension Font {
     static let subtitleDetail = Font.custom("Electrolize", size: 22)
     
     // GS
-    static let gsTitle = Font.custom("Rajdhani-Regular", size: 25)
-    static let gsWindow = Font.custom("Rajdhani-Regular", size: 20)
-    static let coord = Font.custom("Rajdhani-Regular", size: 18)
+    static let gsTitle = Font.custom("Eunomia-Regular", size: 32)
+    static let gsWindow = Font.custom("Electrolize", size: 15)
+    static let coord = Font.custom("Electrolize", size: 16)
     static let pass = Font.custom("Electrolize", size: 20)
     static let fetchPass = Font.custom("Electrolize", size: 15)
     static let passData = Font.custom("Rajdhani-Bold", size: 19)

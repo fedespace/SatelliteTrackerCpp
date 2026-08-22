@@ -23,6 +23,7 @@ struct GS: View {
     @State var passModel: PassViewModel
     @State var maxElevation: String = ""
     @State var duration: String = ""
+    @State var showPasses = false
     // To translate the string utc into date utc
     var utcStringToDate: DateFormatter {
         let utcStringToDate = DateFormatter()
@@ -70,11 +71,25 @@ struct GS: View {
         futurePass.dateFormat = "d MMM"
         return futurePass
     }
+    // Time in the inputs
+    var timeInput: DateFormatter {
+        let timeInput = DateFormatter()
+        timeInput.dateFormat = "HH:mm"
+        return timeInput
+    }
+    // Validity of inputs
+    @State private var isLatValid = true
+    @State private var isLonValid = true
+    @State private var isMaskValid = true
+    @State private var isAltValid = true
+    var isValid: Bool {isLatValid && isLonValid && isMaskValid}
+    @State private var showErrorValues = false
+    @State private var valueErrorMessage = ""
     
     
-   
     
-
+    
+    
     init(
         satellite: Binding<String>,
         startTime: Binding<Date>,
@@ -99,61 +114,49 @@ struct GS: View {
         
         ZStack {
             
-            Color.yaleBlue.ignoresSafeArea()
+            Color.yaleBlue.ignoresSafeArea(.all)
             
             ScrollView {
                 
-                GlassEffectContainer {
-                    
-                    HStack(spacing: 10) {
+                VStack(spacing: 0) {
+                    HStack(spacing: 20) {
                         
                         Image("satellite")
                             .resizable()
                             .foregroundStyle(Color.ivoryMist)
                             .frame(width: 30, height: 30)
-                            .padding(0)
                         
-                        
-                        Text("\($satellite.wrappedValue)")
-                            .font(.eunomiaRegular)
+                        //Text("gtViewModel.satName")
+                        Text("ISS ZARYA")
+                            .font(.gsTitle)
                             .kerning(8)
+                            .scaleEffect(y: 0.9)
                             .foregroundStyle(Color.ivoryMist)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    VStack (alignment: .leading) {
-                        
-                        Text("from \($startTime.wrappedValue.formatted(date: .abbreviated, time: .shortened))")
-                            .font(Font.gsWindow)
-                            .kerning(2)
-                            .foregroundStyle(Color.ivoryMist)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, -15)
-                        
-                        Text("to \($endTime.wrappedValue.formatted(date: .abbreviated, time: .shortened))")
-                            .font(Font.gsWindow)
-                            .kerning(2)
-                            .foregroundStyle(Color.ivoryMist)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                    }
-                    .frame(maxWidth: .infinity)
+                    let fromDateString = futurePass.string(from: $startTime.wrappedValue)
+                    let fromTimeString = timeInput.string(from: $startTime.wrappedValue)
+                    let toDateString = futurePass.string(from: $endTime.wrappedValue)
+                    let toTimeString = timeInput.string(from: $endTime.wrappedValue)
                     
+                    Text("\(fromDateString) \(fromTimeString) → \(toDateString) \(toTimeString)")
+                        .font(Font.gsWindow)
+                        .kerning(1)
+                        .foregroundStyle(Color.ivoryMist)
                 }
-                .padding(20)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .glassEffect(.regular.tint(.darkSlateGrey), in: .rect(cornerRadius: 30.0))
-                
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 20)
+                .padding(.top, 5)
                 
                 GlassEffectContainer {
                     
-                    HStack(spacing: 10) {
+                    HStack(spacing: 15) {
                         
                         Image("gs")
                             .resizable()
                             .foregroundStyle(Color.darkSlateGrey)
                             .frame(width: 30, height: 30)
-                            .padding(.bottom, 8)
+                            .padding(.bottom, 4)
                         
                         Text("Ground Station").textCase(.uppercase)
                             .font(.eunomiaRegular)
@@ -161,114 +164,175 @@ struct GS: View {
                             .foregroundStyle(Color.darkSlateGrey)
                         
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    
-                    HStack(alignment: .center, spacing: 15) {
-                        
-                        VStack {
-                            
-                            VStack(spacing: 0) {
-                                Text("Latitude [deg]")
-                                    .fontWeight(.semibold)
-                                    .font(.coord)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                TextField("", text: $gsLat)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.vertical, 2)
-                                    .padding(.horizontal, 15)
-                                    .frame(maxWidth: 120)
-                                    .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.3)), in: .rect(cornerRadius: 10))
-                            }
-                            
-                            
-                            VStack(spacing: 0) {
-                                Text("Altitude [m]")
-                                    .font(.coord)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                TextField("", text: $gsAlt)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.vertical, 2)
-                                    .padding(.horizontal, 15)
-                                    .frame(maxWidth: 120)
-                                    .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.3)), in: .rect(cornerRadius: 10))
-                            }
-                            
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        VStack {
-                            
-                            VStack(spacing: 0) {
-                                Text("Longitude [deg]")
-                                    .font(.coord)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                TextField("", text: $gsLon)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.vertical, 2)
-                                    .padding(.horizontal, 15)
-                                    .frame(maxWidth: 120)
-                                    .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.3)), in: .rect(cornerRadius: 10))
-                            }
-                            
-                            
-                            VStack(spacing: 0) {
-                                Text("Elev. Mask [deg]")
-                                    .font(.coord)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                TextField("", text: $gsMask)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.vertical, 2)
-                                    .padding(.horizontal, 15)
-                                    .frame(maxWidth: 120)
-                                    .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.3)), in: .rect(cornerRadius: 10))
-                            }
-                            
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        
-                    }
                     .frame(maxWidth: .infinity, alignment: .center)
                     
-                    // Button to fetch passes
-                    HStack {
+                    HStack(spacing: 0) {
                         
-                        Text("Fetch")
-                            .textCase(.uppercase)
-                            .foregroundStyle(Color.ivoryMist)
-                            .font(.fetchPass)
-                        
-                        Image(systemName: "arrow.forward")
-                            .foregroundStyle(Color.ivoryMist)
-                        
-                    }
-                    .padding(.horizontal, 15)
-                    .padding(.vertical, 5)
-                    .glassEffect(.regular.tint(Color.darkSlateGrey), in: .rect(cornerRadius: 30))
-                    .padding(.top, 5)
-                    .onTapGesture {
-                        //passes = []
-                        Task {
-                            await passModel.fetchPasses(name: gtViewModel.satName, line1: gtViewModel.tleLine1, line2: gtViewModel.tleLine2, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
+                        HStack(alignment: .center, spacing: 15) {
+                            
+                            VStack {
+                                
+                                VStack(spacing: 2) {
+                                    Text("Lat [deg]")
+                                        .textCase(.uppercase)
+                                        .font(.coord)
+                                        .kerning(2)
+                                        .foregroundStyle(Color.prussianBlue)
+                                    TextField("", text: $gsLat)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical, 2)
+                                        .padding(.horizontal, 15)
+                                        .frame(maxWidth: 100)
+                                        .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.25)), in: .rect(cornerRadius: 10))
+                                        .onChange(of: gsLat) {
+                                            guard let lat = Int(gsLat) else { return }
+                                            isLatValid = lat >= -90 && lat <= 90
+                                            showErrorValues = !isLatValid
+                                            valueErrorMessage = "Latitude out of allowed range."
+                                        }
+                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(isLatValid ? .clear : .red))
+                                }
+                                
+                                
+                                VStack(spacing: 2) {
+                                    Text("Alt [m]")
+                                        .textCase(.uppercase)
+                                        .font(.coord)
+                                        .kerning(2)
+                                        .foregroundStyle(Color.prussianBlue)
+                                    TextField("", text: $gsAlt)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical, 2)
+                                        .padding(.horizontal, 15)
+                                        .frame(maxWidth: 100)
+                                        .onChange(of: gsAlt) {
+                                            guard let alt = Int(gsAlt) else { return }
+                                            if (alt < 0) {
+                                                isAltValid = false
+                                                showErrorValues = !isAltValid
+                                                valueErrorMessage = "Altitude must be provided."
+                                            } else {
+                                                isAltValid = true
+                                                showErrorValues = !isAltValid
+                                            }
+                                        }
+                                        .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.25)), in: .rect(cornerRadius: 10))
+                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(isAltValid ? .clear : .red))
+                                }
+                            }
+                            
+                            VStack {
+                                
+                                VStack(spacing: 2) {
+                                    Text("Lon [deg]")
+                                        .textCase(.uppercase)
+                                        .font(.coord)
+                                        .kerning(2)
+                                        .foregroundStyle(Color.prussianBlue)
+                                    TextField("", text: $gsLon)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical, 2)
+                                        .padding(.horizontal, 15)
+                                        .frame(maxWidth: 100)
+                                        .onChange(of: gsLon) {
+                                            guard let lon = Int(gsLon) else { return }
+                                            isLonValid = lon >= -180 && lon <= 180
+                                            showErrorValues = !isLonValid
+                                            valueErrorMessage = "Longitude out of allowed range."
+                                        }
+                                        .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.25)), in: .rect(cornerRadius: 10))
+                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(isLonValid ? .clear : .red))
+                                }
+                                
+                                
+                                VStack(spacing: 2) {
+                                    Text("Mask [deg]")
+                                        .textCase(.uppercase)
+                                        .font(.coord)
+                                        .kerning(2)
+                                        .foregroundStyle(Color.prussianBlue)
+                                    TextField("", text: $gsMask)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.vertical, 2)
+                                        .padding(.horizontal, 15)
+                                        .frame(maxWidth:100)
+                                        .onChange(of: gsMask) {
+                                            if (gsMask == "") {
+                                                isMaskValid = false
+                                                showErrorValues = !isMaskValid
+                                                valueErrorMessage = "Elevation mask must be provided."
+                                            } else {
+                                                isMaskValid = true
+                                                showErrorValues = !isMaskValid
+                                            }
+                                        }
+                                        .glassEffect(.regular.tint(.darkSlateGrey.opacity(0.25)), in: .rect(cornerRadius: 10))
+                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(isMaskValid ? .clear : .red))
+                                }
+                                
+                            }
+                            
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 18)
+                        
+                        // Button to fetch passes
+                        var fetchColor = Color.darkSlateGrey.opacity(0.75)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(fetchColor)
+                            .overlay(
+                                Image(systemName: "arrow.forward")
+                                    .foregroundStyle(Color.ivoryMist)
+                                    .scaleEffect(x: 0.8, y: 0.9)
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 10)
+                                    .onTapGesture {
+                                        if (isValid && gsLat != "" && gsLon != "") {
+                                            //passes = []
+                                            fetchColor = Color.darkSlateGrey.opacity(0.75)
+                                            valueErrorMessage = ""
+                                            showPasses = true
+                                            Task {
+                                                await passModel.fetchPasses(name: gtViewModel.satName, line1: gtViewModel.tleLine1, line2: gtViewModel.tleLine2, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
+                                            }
+                                        } else {
+                                            showPasses = false
+                                            showErrorValues = true
+                                            isLatValid = (gsLat == "") ? false : isLatValid
+                                            isLonValid = (gsLon == "") ? false : isLonValid
+                                            isAltValid = (gsAlt == "") ? false : isAltValid
+                                            isMaskValid = (gsMask == "") ? false : isMaskValid
+                                            valueErrorMessage = (gsLat == "" || gsLon == "") ? "Missing input" : valueErrorMessage
+                                            fetchColor = Color.gray.opacity(0.4)
+                                        }
+                                        
+                                    }
+                            )
+                            .frame(width: 35, height: 90)
+                            .padding(.top, 15)
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.trailing, 15)
+                    
                     
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.horizontal, 10)
+                .padding(.top, 10)
                 .padding(.bottom, 15)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 30.0))
-                .padding(.vertical, 10)
+                .glassEffect(.regular.tint(Color.white.opacity(0.8)), in: .rect(cornerRadius: 30.0))
+                .padding(.bottom, 20)
+                .padding(.horizontal, 30)
+                
+                if showErrorValues {
+                    Text(valueErrorMessage)
+                }
+                
+                
                 
                 // Passes container
-                GlassEffectContainer (spacing: 20) {
-                    
-                    HStack(spacing: 10) {
+                if true {//showPasses {
+                    HStack(alignment: .center, spacing: 20) {
                         
                         Image("passes")
                             .resizable()
@@ -276,17 +340,20 @@ struct GS: View {
                             .frame(width: 25, height: 25)
                         
                         Text("Passes").textCase(.uppercase)
-                            //.font(Font.gsTitle)
+                        //.font(Font.gsTitle)
                             .font(.eunomiaRegular)
                             .kerning(8)
                             .foregroundStyle(Color.ivoryMist)
                         
-                        Spacer()
-                        
                     }
                     
+                    
                     // Pass containers
-                    if (passModel.passes.first != nil) {
+                    if (passModel.passes.first == nil) {
+                        
+                        Text("No passes in the selected time window.")
+                        
+                    } else {
                         
                         let aos_UTCDate = utcStringToDate.date(from: String(passModel.passes.first!.aos.split(separator: ".0")[0]))
                         let aos_localString = utcDateToCompleteLocalString.string(from: aos_UTCDate!)
@@ -300,129 +367,117 @@ struct GS: View {
                         let durMin = totalD! / 60.rounded(.towardZero)
                         let durSec = totalD?.truncatingRemainder(dividingBy: 60)
                         let d = String(format: "%dm %ds", Int(durMin), Int(durSec!))
-                       
+                        
                         let mE = passModel.passes.first?.maxEl
                         
-                        VStack {
-                            HStack {
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(Color.prussianBlue.opacity(0.2))
-                                    .stroke(.gray)
-                                    .overlay(
-                                        Text("Next pass")
-                                            .font(.eunomiaRegular)
-                                            .scaleEffect(y: 0.7)
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color.ivoryMist)
+                            .overlay(
+                                VStack {
+                                    HStack {
+                                        RoundedRectangle(cornerRadius: 30)
+                                            .fill(Color.prussianBlue.opacity(0.2))
+                                            .stroke(.gray)
+                                            .overlay(
+                                                Text("Next pass")
+                                                    .font(.eunomiaRegular)
+                                                    .scaleEffect(y: 0.7)
+                                                    .foregroundStyle(Color.darkSlateGrey)
+                                                    .kerning(1)
+                                            )
+                                            .frame(width: 105, height: 25)
+                                        
+                                        Spacer()
+                                        
+                                        Text("in \(String(describing: printedTime!))")
+                                            .font(.firstPass)
                                             .foregroundStyle(Color.darkSlateGrey)
-                                            .kerning(1)
-                                    )
-                                    .frame(width: 105, height: 25)
-                                
-                                Spacer()
-                                
-                                Text("in \(String(describing: printedTime!))")
-                                    .font(.firstPass)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                    .padding(.top, 5)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.bottom, 6)
-                            .padding(.horizontal, 8)
-                            
-                            HStack (alignment: .center, spacing: 25){
-                                
-                                
-                                VStack {
+                                            .padding(.top, 5)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, 6)
+                                    .padding(.horizontal, 8)
                                     
+                                    HStack (alignment: .center, spacing: 25){
+                                        
+                                        
+                                        VStack {
+                                            
+                                            Text("AOS")
+                                                .font(Font.fetchPass)
+                                                .foregroundStyle(Color.prussianBlue)
+                                                .kerning(2)
+                                            Text("\(utcDateToLocalString.string(from: aos_UTCDate!))")
+                                                .font(Font.passData)
+                                                .kerning(0.5)
+                                                .foregroundStyle(Color.prussianBlue)
+                                        }
+                                        
+                                        VStack {
+                                            Text("MAX EL")
+                                                .font(Font.fetchPass)
+                                                .foregroundStyle(Color.prussianBlue)
+                                                .kerning(2)
+                                            Text("\(mE!.prefix(5))")
+                                                .font(Font.passData)
+                                                .kerning(0.5)
+                                                .foregroundStyle(Color.prussianBlue)
+                                        }
+                                        
+                                        VStack {
+                                            Text("LOS")
+                                                .font(Font.fetchPass)
+                                                .foregroundStyle(Color.prussianBlue)
+                                                .kerning(2)
+                                            Text("\(utcDateToLocalString.string(from: los_UTCDate!))")
+                                                .font(Font.passData)
+                                                .kerning(0.5)
+                                                .foregroundStyle(Color.prussianBlue)
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, 5)
                                     
-                                    Text("AOS")
-                                        .font(Font.fetchPass)
-                                        .foregroundStyle(Color.prussianBlue)
-                                        .kerning(2)
-                                    Text("\(utcDateToLocalString.string(from: aos_UTCDate!))")
-                                        .font(Font.passData)
-                                        .kerning(0.5)
-                                        .foregroundStyle(Color.prussianBlue)
+                                    HStack {
+                                        Text("Duration").textCase(.uppercase)
+                                            .font(Font.fetchPass)
+                                            .fontWeight(.heavy)
+                                            .foregroundStyle(Color.prussianBlue)
+                                            .kerning(2)
+                                        
+                                        Spacer()
+                                        
+                                        Text("\(d)")//"\(durMin)m \(durSec)s")
+                                            .font(Font.fetchPass)
+                                            .foregroundStyle(Color.prussianBlue)
+                                            .kerning(2)
+                                    }
+                                    .padding(.horizontal, 15)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    HStack {
+                                        Text("QoS")
+                                            .font(Font.fetchPass)
+                                            .foregroundStyle(Color.prussianBlue)
+                                            .kerning(2)
+                                        
+                                        Spacer()
+                                        
+                                        Text("percent bar") //da costruire
+                                    }
+                                    .padding(.horizontal, 15)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                                
-                                VStack {
-                                    Text("MAX EL")
-                                        .font(Font.fetchPass)
-                                        .foregroundStyle(Color.prussianBlue)
-                                        .kerning(2)
-                                    Text("\(mE!.prefix(5))")
-                                        .font(Font.passData)
-                                        .kerning(0.5)
-                                        .foregroundStyle(Color.prussianBlue)
-                                }
-                                
-                                VStack {
-                                    Text("LOS")
-                                        .font(Font.fetchPass)
-                                        .foregroundStyle(Color.prussianBlue)
-                                        .kerning(2)
-                                    Text("\(utcDateToLocalString.string(from: los_UTCDate!))")
-                                        .font(Font.passData)
-                                        .kerning(0.5)
-                                        .foregroundStyle(Color.prussianBlue)
-                                }
-                            }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 10)
+                            )
                             .frame(maxWidth: .infinity)
-                            .padding(.bottom, 5)
-                            
-                            HStack {
-                                Text("Duration").textCase(.uppercase)
-                                    .font(Font.fetchPass)
-                                    .fontWeight(.heavy)
-                                    .foregroundStyle(Color.prussianBlue)
-                                    .kerning(2)
-                                
-                                Spacer()
-                                
-                                Text("\(d)")//"\(durMin)m \(durSec)s")
-                                    .font(Font.fetchPass)
-                                    .foregroundStyle(Color.prussianBlue)
-                                    .kerning(2)
-                            }
+                            .frame(height: 155)
+                            .padding(.bottom, 7)
                             .padding(.horizontal, 15)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            HStack {
-                                Text("QoS")
-                                    .font(Font.fetchPass)
-                                    .foregroundStyle(Color.prussianBlue)
-                                    .kerning(2)
-                                
-                                Spacer()
-                                
-                                Text("percent bar") //da costruire
-                            }
-                            .padding(.horizontal, 15)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 10)
-                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
-                        .padding(.bottom, 7)
-                        
-                        
                     }
                     
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(Color.ivoryMist.opacity(0.2))
-                        .stroke(Color.ivoryMist)
-                        .overlay(
-                            Text("Future Passes")
-                                .font(.eunomiaRegular)
-                                .foregroundStyle(Color.ivoryMist)
-                                .kerning(4)
-                                .scaleEffect(y: 0.8)
-                            )
-                        .frame(width: 250, height: 25, alignment: .leading)
-                        .padding(.bottom, 3)
-                    
-                    let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.enumerated())
+                    let indexedPasses: [(offset: Int, element: Pass)] = Array(passModel.passes.dropFirst().enumerated())
                     
                     ForEach(indexedPasses, id: \.offset) { index, p in
                         
@@ -441,133 +496,50 @@ struct GS: View {
                         let passMin = Int(los_localDate!.timeIntervalSince(aos_localDate!) / 60.rounded(.towardZero))
                         
                         
-                        HStack {
-                            
-                            VStack(alignment: .leading, spacing: -3) {
-                                Text("\(when), \(futurePassesAOS)")
-                                    .font(.eunomiaRegular)
-                                    .scaleEffect(y: 0.8)
-                                    .foregroundStyle(Color.darkSlateGrey)
-                                
-                                Text("\(passMin) min · max \(p.maxEl.prefix(2))°")
-                                    .font(.durElev)
-                                    .opacity(0.6)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            RoundedRectangle(cornerRadius: 30)
-                                .fill(.clear)
-                                .stroke(.gray)
-                                .overlay(
-                                    Text("QoS")
-                                        .font(.durElev)
-                                        .foregroundStyle(Color.darkSlateGrey)
-                                    )
-                                .frame(width: 60, height: 25, alignment: .leading)
-                            
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 20)
-                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
-                        .padding(.bottom, 3)
-                        
-                        
-//                        VStack {
-//                            
-//                            
-//                            HStack (alignment: .center, spacing: 20){
-//                                
-//                                
-//                                VStack {
-//                                    
-//                                    
-//                                    Text("AOS")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                        .kerning(2)
-//                                    Text("\(aosStringDisplay)")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                }
-//                                
-//                                VStack {
-//                                    Text("LOS")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                        .kerning(2)
-//                                    Text("\(losStringDisplay)")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                }
-//                                
-//                                VStack {
-//                                    Text("MAX EL")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                        .kerning(2)
-//                                    Text("\(p.maxEl.prefix(5))")
-//                                        .font(Font.fetchPass)
-//                                        .foregroundStyle(Color.prussianBlue)
-//                                }
-//                                
-//                                
-//                            }
-//                            .padding(.bottom, 5)
-//                            
-//                            // Duration
-//                            HStack {
-//                                Text("Duration").textCase(.uppercase)
-//                                    .font(Font.fetchPass)
-//                                    .fontWeight(.heavy)
-//                                    .foregroundStyle(Color.prussianBlue)
-//                                    .kerning(2)
-//                                
-//                                Spacer()
-//                                
-//                                Text("\(passModel.duration[index])")
-//                                    .font(Font.fetchPass)
-//                                    .foregroundStyle(Color.prussianBlue)
-//                                    .kerning(2)
-//                            }
-//                            .padding(.horizontal, 15)
-//                            .frame(maxWidth: .infinity, alignment: .leading)
-//                            
-//                            
-//                            // Quality of Signal
-//                            HStack {
-//                                Text("Quality").textCase(.uppercase)
-//                                    .font(Font.fetchPass)
-//                                    .foregroundStyle(Color.prussianBlue)
-//                                    .kerning(2)
-//                                
-//                                Spacer()
-//                                
-//                                Text("percent bar") //da costruire
-//                            }
-//                            .padding(.horizontal, 15)
-//                            .frame(maxWidth: .infinity, alignment: .leading)
-//                            
-//                        }
-//                        .padding(15)
-//                        .frame(maxWidth: .infinity)
-//                        .glassEffect(.regular.tint(Color.white), in: .rect(cornerRadius: 18))
-//                        .padding(.bottom, 8)
-                        
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.ivoryMist.opacity(1))
+                            .overlay(
+                                HStack {
+                                    
+                                    VStack(alignment: .leading, spacing: -3) {
+                                        Text("\(when), \(futurePassesAOS)")
+                                            .font(.eunomiaRegular)
+                                            .scaleEffect(y: 0.8)
+                                            .foregroundStyle(Color.darkSlateGrey)
+                                        
+                                        Text("\(passMin) min · max \(p.maxEl.prefix(2))°")
+                                            .font(.durElev)
+                                            .foregroundStyle(Color.darkSlateGrey)
+                                            .opacity(0.8)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    RoundedRectangle(cornerRadius: 30)
+                                        .fill(.clear)
+                                        .stroke(.gray)
+                                        .overlay(
+                                            Text("QoS")
+                                                .font(.durElev)
+                                                .foregroundStyle(Color.darkSlateGrey)
+                                        )
+                                        .frame(width: 60, height: 25, alignment: .leading)
+                                    
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 20)
+                            )
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .padding(.bottom, 3)
+                            .padding(.horizontal, 15)
                     }
                 }
-                .padding(.top, 20)
-                .padding(.bottom, 15)
-                .padding(.horizontal, 20)
-                .frame(maxHeight: .infinity)
-                .frame(maxWidth: .infinity)
-                .glassEffect(.clear, in: .rect(cornerRadius: 30))
-                
             }
-            .padding(.horizontal, 30)
-            .padding(.top, 20)
         }
     }
 }
+                  
 
 #Preview {
     let mockModel = PassViewModel()

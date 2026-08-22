@@ -147,11 +147,9 @@ int main() {
             aos = time2string(passes[i].AOS);
             aos.substr(0, aos.length() - 7);
             result[id]["aos"] = aos;
-            std::cout << "AOS sent to swift: " << aos << "\n";
             los = time2string(passes[i].LOS);
             los.substr(0, los.length() - 7);
             result[id]["los"] = time2string(passes[i].LOS);
-            std::cout << "LOS sent to swift: " << los << "\n";
             result[id]["maxEl"] = std::to_string(passes[i].max_el);
             result[id]["duration"] = std::to_string(passes[i].duration);
             result[id]["quality"] = "";

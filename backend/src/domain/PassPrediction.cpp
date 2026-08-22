@@ -120,6 +120,8 @@ std::vector<double> ENU2ElAz(Vector3D r_enu) {
     return elAz;
 }
 
+
+
 std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, double lat, double lon, double alt, double elevationMask, double step) {
     // Inputs: time [UTC], coordinate [deg, m], step [s]
     
@@ -210,9 +212,9 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     // Define elevation at the step - 1 for comparison 
     double e_old = window[0].elevation;
 
-    std::cout << lat << " " << lon << " " << elevationMask << "\n";
-
     int index = 0;
+    double t0, t1, e0, e1, sharpness;
+    size_t i_maxEl;
     
     for(int iter = 1; iter < window.size(); iter++) {
 
@@ -221,7 +223,6 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
 
         if (!pass && e > elevationMask && e_old < e) {
             singlePass.AOS = window[iter - 1].time;
-            std::cout << time2string(singlePass.AOS) << "\n";
             singlePass.max_el = e;
             pass = true;
         }
@@ -229,6 +230,7 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
         // Update max elevation
         if (pass && e > singlePass.max_el) {
             singlePass.max_el = e;
+            singlePass.time_maxEl = t;
         }
 
         if (pass && e < elevationMask && e_old > e) {
@@ -236,11 +238,29 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
             singlePass.id = index;
             singlePass.duration = (epoch2mins(singlePass.LOS) - epoch2mins(singlePass.AOS));
             prediction.push_back(singlePass);
-            std::cout << "LOS: " << time2string(singlePass.LOS) << "\n"; 
+            std::cout << "sharpness " << singlePass.sharpness << "\n";
             singlePass = {};
             index++;
             pass = false;
         }
+
+        auto it = std::find_if(window.begin(), window.end(), [&](const WindowElevation& w) {
+            return w.elevation == singlePass.max_el;
+        });
+        if (it != window.end()) {
+            i_maxEl = std::distance(window.begin(), it);
+        }
+        if (i_maxEl >= 12 && i_maxEl + 12 < window.size()) {
+            e0 = window[i_maxEl-12].elevation;
+            e1 = window[i_maxEl+12].elevation;
+            t0 = epoch2mins(window[i_maxEl-12].time) - 1.0;
+            t1 = epoch2mins(window[i_maxEl-12].time) + 1.0;
+            singlePass.sharpness = (e1 - e0) / ((t1 - t0)*60); // el divided by seconds
+        } else {
+            singlePass.sharpness = 0;
+        }
+
+        
 
         e_old = e;
 

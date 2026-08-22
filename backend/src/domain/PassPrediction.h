@@ -4,6 +4,7 @@
 #include "TimeUtils.h"
 #include "./sgp4Propagator.h"
 #include "./Tle.h"
+#include <algorithm>
 
 // ========================
 
@@ -13,6 +14,8 @@ struct PassPrediction {
     TimeUTC AOS;
     TimeUTC LOS;
     double max_el;
+    TimeUTC time_maxEl;
+    double sharpness;
     double duration;
 };
 
