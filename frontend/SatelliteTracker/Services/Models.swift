@@ -75,9 +75,9 @@ extension Pass {
 
 extension Pass {
     static let mockPasses: [Pass] = [
-        Pass(id: 0, aos: "2026-8-21 7:43:10.000000", los: "2026-8-21 7:49:50.000000", maxEl: "78.212110", duration: "6.666667", quality: ""),
-        Pass(id: 1, aos: "2026-8-21 9:19:55.000000", los: "2026-8-21 9:26:35.000000", maxEl: "74.411498", duration: "6.666667", quality: ""),
-        Pass(id: 2, aos: "2026-8-21 11:02:30.000000", los: "2026-8-21 11:10:05.000000", maxEl: "45.100000", duration: "7.583333", quality: "")
+        Pass(id: 0, aos: "2026-8-21 7:43:10.000000", los: "2026-8-21 7:49:50.000000", maxEl: "78.212110", duration: "6.666667", quality: "FAIR"),
+        Pass(id: 1, aos: "2026-8-21 9:19:55.000000", los: "2026-8-21 9:26:35.000000", maxEl: "74.411498", duration: "6.666667", quality: "POOR"),
+        Pass(id: 2, aos: "2026-8-21 11:02:30.000000", los: "2026-8-21 11:10:05.000000", maxEl: "45.100000", duration: "7.583333", quality: "FAIR")
             
     ]
 }

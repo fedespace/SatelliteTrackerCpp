@@ -15,7 +15,7 @@ struct PassPrediction {
     TimeUTC LOS;
     double max_el;
     TimeUTC time_maxEl;
-    double sharpness;
+    std::string qos;
     double duration;
 };
 

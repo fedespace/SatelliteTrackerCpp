@@ -152,7 +152,8 @@ int main() {
             result[id]["los"] = time2string(passes[i].LOS);
             result[id]["maxEl"] = std::to_string(passes[i].max_el);
             result[id]["duration"] = std::to_string(passes[i].duration);
-            result[id]["quality"] = "";
+            result[id]["quality"] = passes[i].qos;
+            std::cout << result[id]["quality"];
             }
         
         res.set_content(result.dump(), "application/json");

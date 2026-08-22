@@ -29,14 +29,6 @@ class PassViewModel {
         durationFormatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
         return durationFormatter
     }
-//    var aosLocal: [String] {
-//        let utctime = passes.map { utcFormatter.date(from: String($0.aos.split(separator: ".0")[0])) }
-//        return utctime.map {localFormatter.string(from: $0!)}
-//    }
-//    var losLocal: [String] {
-//        let utctime = passes.map { utcFormatter.date(from: String($0.los.split(separator: ".0")[0])) }
-//        return utctime.map {localFormatter.string(from: $0!)}
-//    }
     var duration: [String] {
         passes.compactMap { p in
             let totalSeconds = Int(Double(p.duration)! * 60)

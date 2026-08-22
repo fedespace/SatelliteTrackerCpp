@@ -89,7 +89,6 @@ struct GS: View {
     
     
     
-    
     init(
         satellite: Binding<String>,
         startTime: Binding<Date>,
@@ -295,6 +294,9 @@ struct GS: View {
                                             Task {
                                                 await passModel.fetchPasses(name: gtViewModel.satName, line1: gtViewModel.tleLine1, line2: gtViewModel.tleLine2, startTime: startTime, endTime: endTime, gsLat: gsLat, gsLon: gsLon, gsAlt: gsAlt, gsMask: gsMask, inputType: inputType, searchItem: searchItem!)
                                             }
+                                            if (passModel.passes.first == nil) {
+                                                Text("No passes in the selected time window.")
+                                            }
                                         } else {
                                             showPasses = false
                                             showErrorValues = true
@@ -331,7 +333,7 @@ struct GS: View {
                 
                 
                 // Passes container
-                if true {//showPasses {
+                if showPasses {//showPasses {
                     HStack(alignment: .center, spacing: 20) {
                         
                         Image("passes")
@@ -340,7 +342,6 @@ struct GS: View {
                             .frame(width: 25, height: 25)
                         
                         Text("Passes").textCase(.uppercase)
-                        //.font(Font.gsTitle)
                             .font(.eunomiaRegular)
                             .kerning(8)
                             .foregroundStyle(Color.ivoryMist)
@@ -349,11 +350,7 @@ struct GS: View {
                     
                     
                     // Pass containers
-                    if (passModel.passes.first == nil) {
-                        
-                        Text("No passes in the selected time window.")
-                        
-                    } else {
+                    if (passModel.passes.first != nil) {
                         
                         let aos_UTCDate = utcStringToDate.date(from: String(passModel.passes.first!.aos.split(separator: ".0")[0]))
                         let aos_localString = utcDateToCompleteLocalString.string(from: aos_UTCDate!)
@@ -369,6 +366,18 @@ struct GS: View {
                         let d = String(format: "%dm %ds", Int(durMin), Int(durSec!))
                         
                         let mE = passModel.passes.first?.maxEl
+                        
+                        var qosFill: Int {
+                            if (passModel.passes.first!.quality == "POOR") {
+                                return 25
+                            } else if (passModel.passes.first!.quality == "FAIR") {
+                                return 50
+                            } else if (passModel.passes.first!.quality == "GOOD") {
+                                return 75
+                            } else {
+                                return 100
+                            }
+                        }
                         
                         RoundedRectangle(cornerRadius: 18)
                             .fill(Color.ivoryMist)
@@ -463,7 +472,17 @@ struct GS: View {
                                         
                                         Spacer()
                                         
-                                        Text("percent bar") //da costruire
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(.clear)
+                                            .stroke(.gray.opacity(0.4))
+                                            .frame(width: 200, height: 8)
+                                            .overlay (alignment: .leading) {
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .fill(Color.sageGreen)
+                                                    .frame(width: CGFloat(200*qosFill/100))
+                                            }
+                                        
+                                            
                                     }
                                     .padding(.horizontal, 15)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -494,7 +513,17 @@ struct GS: View {
                         let when = todayBool ? "Today" : (tomorrowBool ? "Tomorrow" : "\(futurePass.string(from: aos_localDate!))")
                         let futurePassesAOS = utcDateToLocalString_hh_mm.string(from: aosDateUTC!)
                         let passMin = Int(los_localDate!.timeIntervalSince(aos_localDate!) / 60.rounded(.towardZero))
-                        
+                        var colorQOS: Color {
+                            if (p.quality == "POOR") {
+                                return .qosPoor.opacity(0.7)
+                            } else if (p.quality == "FAIR") {
+                                return .qosFair.opacity(0.9)
+                            } else if (p.quality == "GOOD") {
+                                return .qosGood.opacity(0.8)
+                            } else {
+                                return .qosExcellent.opacity(0.65)
+                            }
+                        }
                         
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.ivoryMist.opacity(1))
@@ -514,16 +543,12 @@ struct GS: View {
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    RoundedRectangle(cornerRadius: 30)
-                                        .fill(.clear)
-                                        .stroke(.gray)
-                                        .overlay(
-                                            Text("QoS")
-                                                .font(.durElev)
-                                                .foregroundStyle(Color.darkSlateGrey)
-                                        )
-                                        .frame(width: 60, height: 25, alignment: .leading)
-                                    
+                                    Text("\(p.quality)")
+                                        .font(.durElev)
+                                        .foregroundStyle(Color.prussianBlue)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .glassEffect(.regular.tint(colorQOS), in: .capsule)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)

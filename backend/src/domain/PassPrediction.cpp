@@ -213,8 +213,9 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     double e_old = window[0].elevation;
 
     int index = 0;
-    double t0, t1, e0, e1, sharpness;
+    double t0, t1, e0, e1, sharpness, sharpnessScore, maxElScore, pass_score;
     size_t i_maxEl;
+    std::string qos;
     
     for(int iter = 1; iter < window.size(); iter++) {
 
@@ -238,7 +239,6 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
             singlePass.id = index;
             singlePass.duration = (epoch2mins(singlePass.LOS) - epoch2mins(singlePass.AOS));
             prediction.push_back(singlePass);
-            std::cout << "sharpness " << singlePass.sharpness << "\n";
             singlePass = {};
             index++;
             pass = false;
@@ -255,13 +255,31 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
             e1 = window[i_maxEl+12].elevation;
             t0 = epoch2mins(window[i_maxEl-12].time) - 1.0;
             t1 = epoch2mins(window[i_maxEl-12].time) + 1.0;
-            singlePass.sharpness = (e1 - e0) / ((t1 - t0)*60); // el divided by seconds
-        } else {
-            singlePass.sharpness = 0;
         }
-
-        
-
+        sharpness = (e1 - e0) / ((t1 - t0)*60); // el divided by seconds
+        if (sharpness < 0.05) {
+            sharpnessScore = 0.0;
+        } else if (sharpness >= 0.05 && sharpness >= 0.3) {
+            sharpnessScore = (sharpness - 0.05) / (0.3 - 0.05) * 100;
+        } else if (sharpness > 0.3) {
+            sharpnessScore = 100.0;
+        }
+        if (singlePass.max_el < 10.0) {
+            maxElScore = 0.0;
+        } else {
+            maxElScore = (singlePass.max_el - 10) / 80 * 100;
+        }
+        pass_score = 0.7*maxElScore + 0.3*sharpnessScore;
+        if (pass_score < 25) {
+            qos = "POOR";
+        } else if (pass_score >= 25 && pass_score < 50) {
+            qos = "FAIR";
+        } else if (pass_score >= 50 && pass_score < 75) {
+            qos = "GOOD";
+        } else {
+            qos = "EXCELLENT";
+        }
+        singlePass.qos = qos;
         e_old = e;
 
     }
