@@ -22,7 +22,7 @@ add_executable(SatelliteTracker
     src/domain/PassPrediction.cpp
 )
 
-# SGP4 is its own library
+# SGP4 and hhtpLib
 add_library(sgp4
     external/sgp4/sgp4.cpp
 )
@@ -33,6 +33,7 @@ set_source_files_properties(
 
 # The app is linked to it
 target_include_directories(sgp4 PUBLIC external/sgp4)
+target_include_directories(SatelliteTracker PRIVATE external/httpLib)
 target_link_libraries(SatelliteTracker PRIVATE sgp4)
 
 # For ROOT library (developed by CERN)

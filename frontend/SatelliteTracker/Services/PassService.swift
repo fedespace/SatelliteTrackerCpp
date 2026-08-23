@@ -28,7 +28,7 @@ struct PassService {
             req.name = String(searchItem.dropLast(139)).trimmingCharacters(in: .whitespaces)
         } else {
             req.line2 = line2
-            req.line1 = line2
+            req.line1 = line1
             req.name = name
         }
         req.startTime = startFormatted

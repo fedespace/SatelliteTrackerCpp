@@ -6,8 +6,8 @@
 #include <array>
 #include "../../external/sgp4/SGP4.h"
 #include <tuple>
-#include "../external/httpLib/httplib.h"
-#include "../external/httpLib/json.hpp"
+#include "../../external/httpLib/httplib.h"
+#include "../../external/httpLib/json.hpp"
 
 // ===============================
 
