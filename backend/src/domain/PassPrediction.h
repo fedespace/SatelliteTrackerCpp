@@ -5,6 +5,7 @@
 #include "./sgp4Propagator.h"
 #include "./Tle.h"
 #include <algorithm>
+#include <numeric>
 
 // ========================
 
@@ -17,6 +18,7 @@ struct PassPrediction {
     TimeUTC time_maxEl;
     std::string qos;
     double duration;
+    bool passIsVisible;
 };
 
 // Entire window
@@ -39,3 +41,9 @@ std::vector<double> ENU2ElAz(Vector3D r_enu);
 
 // While cycle to compute AOS and LOS as TimeUTC objects
 std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, double lat, double lon, double alt, double elevationMask, double step);
+
+std::vector<double> sun_eci(double jd);
+
+bool satInLight(Vector3D sat_TEME, double jd);
+
+bool observer_darkness(std::vector<double> sun_ECI, Vector3D r_gs, TimeUTC AOS, int threshold);

@@ -156,6 +156,7 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     double finalDelta = timeE_min - time_TLE_min;
 
     // Initialise variables
+    Matrix3x3 R;
     double r[3], v[3];
     double jd, jdfrac;
 
@@ -179,7 +180,7 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
         double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
 
         // Compute again the new rotation matrix
-        Matrix3x3 R = rotation_teme2ecef(gstime);
+        R = rotation_teme2ecef(gstime);
 
         // Conversion from r_sat in TEME to ECEF
         Vector3D r_teme = {r[0], r[1], r[2]};
@@ -238,6 +239,38 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
             singlePass.LOS = window[iter - 1].time;
             singlePass.id = index;
             singlePass.duration = (epoch2mins(singlePass.LOS) - epoch2mins(singlePass.AOS));
+            
+            // Check if pass is considered visible from observer (iterating each min)
+            double visibility_time = epoch2mins(singlePass.AOS);
+            bool isSatelliteInLight;
+            bool isDark;
+            for (double i = visibility_time; visibility_time < epoch2mins(singlePass.LOS); visibility_time++) {
+                // Is satellite in the light
+                TimeUTC vt = MJD20002epoch(visibility_time);
+                Vector3D s_m = r_sat(tle, vt); // [m]
+                Vector3D s_km;
+                s_km.x = s_m.x / 1000.0;
+                s_km.y = s_m.y / 1000.0;
+                s_km.z = s_m.z / 1000.0;
+                double jd_v, jdf_v;
+                SGP4Funcs::jday_SGP4(
+                    vt.year, vt.month, vt.day, vt.hour, vt.minute, vt.second,
+                    jd_v, jdf_v
+                );
+                double jd_full_v = jd_v + jdf_v;
+                isSatelliteInLight = satInLight(s_km, jd_full_v);
+
+                // Is the sky dark enough
+                std::vector<double> s_eci = sun_eci(jd_full_v);
+                isDark = observer_darkness(s_eci, gs_ecef, vt, -6.0);
+                std::cout << "light & darkness:" << isSatelliteInLight << " " << isDark << "\n";
+                // Combining the two checks
+                if (isSatelliteInLight && isDark) {
+                    singlePass.passIsVisible = true;
+                    break;
+                }
+            }
+
             prediction.push_back(singlePass);
             singlePass = {};
             index++;
@@ -285,4 +318,103 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
     }
 
     return prediction;
+}
+
+std::vector<double> sun_eci(double jd) {
+    // J2000 centuries
+    double jd_century = (jd - 2451545.0) / 36525.0;
+    // Sun mean longitude [deg]
+    double lon_M = 280.460 + 36000.771 * jd_century;
+    lon_M = fmod(lon_M, 360.0);
+    if (lon_M < 0) {
+        lon_M += 360.0;
+    }
+    // Sun mean anomaly [deg]
+    double M = 357.528 + 35999.050 * jd_century;
+    M = fmod(M, 360.0);
+    if (M < 0) {
+        M += 360.0;
+    }
+    // Eclictic longitude
+    double l_ecl = lon_M + 1.915 * std::sin(M*M_PI/180.0) + 0.020 * std::sin(2*M*M_PI/180.0);
+    // Ecliptic angle
+    double eps = 23.439 - 0.0000004 * jd_century;
+    // Create vector
+    double l_ecl_rad = l_ecl * M_PI/180.0;
+    double eps_rad = eps * M_PI/180.0;
+    // ECI sun vector: negligible detail for the purpose even if sat is TEME
+    std::vector<double> sun_ECI = {
+        std::cos(l_ecl_rad),
+        std::cos(eps_rad) * std::sin(l_ecl_rad),
+        std::sin(eps_rad) * std::sin(l_ecl_rad)
+    };
+
+    return sun_ECI;
+}
+
+bool satInLight(Vector3D sat, double jd) {
+    std::vector<double> sun_ECI = sun_eci(jd);
+    std::vector<double> sat_TEME = {
+        sat.x,
+        sat.y,
+        sat.z
+    };
+
+    // Check eclipsis with cylindrical shadow model
+    bool inLight;
+    double dot_product_vectors = std::inner_product(sat_TEME.begin(), sat_TEME.end(), sun_ECI.begin(), 0.0);
+    // dot product < 0: satellite is on opposite side of the Earth
+    if (dot_product_vectors < 0) {
+        // Shadow
+        double sun = std::sqrt(sun_ECI[0]*sun_ECI[0]+sun_ECI[1]*sun_ECI[1]+sun_ECI[2]*sun_ECI[2]);
+        double sat = std::sqrt(sat_TEME[0]*sat_TEME[0]+sat_TEME[1]*sat_TEME[1]+sat_TEME[2]*sat_TEME[2]);
+        double cos = dot_product_vectors / (sun*sat);
+        double perpDistance = sat * std::sqrt(1 - cos*cos); // sat distance from the earth-sun axis
+        double e_radius = 6378.137;
+        if (perpDistance < e_radius) {
+            inLight = false; //eclipsed
+        } else {
+            inLight = true; //light is on the sat
+        }
+    } else {
+    inLight = true; 
+    }
+
+    return inLight;
+}
+
+bool observer_darkness(std::vector<double> sun_ECI, Vector3D r_gs, TimeUTC t, int threshold) {
+    // Inputs: sun_ECI [km], r_gs [m]
+    bool darkness;
+
+    // Conversion of ECI sun vector to ECEF
+    double jd, jdfrac;
+    SGP4Funcs::jday_SGP4(
+            t.year, t.month, t.day, t.hour, t.minute, t.second,
+            jd, jdfrac
+        );
+    double jd_full = jd + jdfrac;
+    double gstime = SGP4Funcs::gstime_SGP4(jd_full); // [rad]
+    Matrix3x3 rotation = rotation_teme2ecef(gstime);
+    Vector3D s_eci = {sun_ECI[0], sun_ECI[1], sun_ECI[2]};
+    Vector3D s_ecef = rotateZ(rotation, s_eci); // [km]
+    
+    // Normalize vectors sun and observer to get directions only (convert r_gs from m to km)
+    double s = s_ecef.norm();
+    std::vector<double> r_obs = {r_gs.x/1000.0, r_gs.y/1000.0, r_gs.z/1000.0};
+    double o = std::sqrt(r_obs[0]*r_obs[0] + r_obs[1]*r_obs[1] + r_obs[2]*r_obs[2]);
+    std::vector<double> s_norm = {s_ecef.x/s, s_ecef.y/s, s_ecef.z/s};
+    std::vector<double> o_norm = {r_obs[0]/o, r_obs[1]/o, r_obs[2]/o};
+
+    // Compute dot product to find angle between the two vectors
+    double sun_elevation = std::asin(std::inner_product(s_norm.begin(), s_norm.end(), o_norm.begin(), 0.0));
+    double s_elevation_deg = sun_elevation * 180/M_PI;
+
+    if (s_elevation_deg < threshold) {
+        darkness = true;
+    } else {
+        darkness = false;
+    }
+
+    return darkness;
 }
