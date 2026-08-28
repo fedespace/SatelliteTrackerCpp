@@ -9,6 +9,12 @@ import SwiftUI
 
 struct Alert: View {
     var body: some View {
-        Text("Alerts")
+        ZStack {
+            
+            Color.yaleBlue.ignoresSafeArea()
+            
+            Text("Alerts")
+            
+        }
     }
 }

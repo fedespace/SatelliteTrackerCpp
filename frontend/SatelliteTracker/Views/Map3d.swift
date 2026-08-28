@@ -9,6 +9,12 @@ import SwiftUI
 
 struct Map3d: View {
     var body: some View {
-        Text("Map 3d")
+        ZStack {
+            
+            Color.yaleBlue.ignoresSafeArea()
+            
+            Text("Map 3d")
+            
+        }
     }
 }
