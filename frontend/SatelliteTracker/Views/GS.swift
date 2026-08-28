@@ -335,7 +335,7 @@ struct GS: View {
                 
                 
                 // Passes container
-                if showPasses {
+                if true {//showPasses {
                     
                     // Pass containers
                     if (passModel.passes.first != nil) {
@@ -355,7 +355,7 @@ struct GS: View {
                         let todayBool = Calendar.current.isDateInToday(aos_localDate!)
                         let tomorrowBool = Calendar.current.isDateInTomorrow(aos_localDate!)
                         let when = todayBool ? "Today" : (tomorrowBool ? "Tomorrow" : "\(futurePass.string(from: aos_localDate!))")
-                        
+                        let visible = (passModel.passes.first?.visible == "1") ? true : false
                         
                         let mE = passModel.passes.first?.maxEl
                         
@@ -455,47 +455,59 @@ struct GS: View {
                                         .padding(.bottom, 5)
                                         
                                         HStack {
-                                            Text("Duration").textCase(.uppercase)
-                                                .font(Font.fetchPass)
-                                                .fontWeight(.heavy)
-                                                .foregroundStyle(Color.prussianBlue)
-                                                .kerning(2)
                                             
-                                            Spacer()
-                                            
-                                            Text("\(d)")//"\(durMin)m \(durSec)s")
-                                                .font(Font.fetchPass)
-                                                .foregroundStyle(Color.prussianBlue)
-                                                .kerning(2)
-                                        }
-                                        .padding(.horizontal, 15)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        
-                                        HStack {
-                                            Text("QoS")
-                                                .font(Font.fetchPass)
-                                                .foregroundStyle(Color.prussianBlue)
-                                                .kerning(2)
-                                            
-                                            Spacer()
-                                            
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(.clear)
-                                                .stroke(.gray.opacity(0.4))
-                                                .frame(width: 200, height: 8)
-                                                .overlay (alignment: .leading) {
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .fill(Color.sageGreen)
-                                                        .frame(width: CGFloat(200*qosFill/100))
+                                            VStack (alignment: .leading, spacing: 1) {
+                                                HStack {
+                                                    Text("Duration").textCase(.uppercase)
+                                                        .font(Font.fetchPass)
+                                                        .fontWeight(.heavy)
+                                                        .foregroundStyle(Color.prussianBlue)
+                                                        .kerning(2)
+                                                        .padding(.trailing, 20)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Text("\(d)")//"\(durMin)m \(durSec)s")
+                                                        .font(Font.fetchPass)
+                                                        .foregroundStyle(Color.prussianBlue)
+                                                        .kerning(2)
                                                 }
+                                                
+                                                HStack {
+                                                    Text("QoS")
+                                                        .font(Font.fetchPass)
+                                                        .foregroundStyle(Color.prussianBlue)
+                                                        .kerning(2)
+                                                    
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .fill(.clear)
+                                                        .stroke(.gray.opacity(0.4))
+                                                        .frame(width: 235, height: 8)
+                                                        .overlay (alignment: .leading) {
+                                                            RoundedRectangle(cornerRadius: 10)
+                                                                .fill(Color.sageGreen)
+                                                                .frame(width: CGFloat(200*qosFill/100))
+                                                        }
+                                                }
+                                                
+                                            }
+                                            .frame(width: 280, height: 40, alignment: .leading)
                                             
+                                            Spacer()
                                             
+                                            Image("visible")
+                                                .resizable()
+                                                .frame(width: 25, height: 25)
+                                                .padding(0)
+                                                .padding(.trailing, 5)
+                                                .foregroundStyle(visible ? Color.prussianBlue : Color.prussianBlue.opacity(0.2))
                                         }
-                                        .padding(.horizontal, 15)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.leading, 15)
+                                        .padding(.trailing, 5)
                                     }
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 10)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 10)
                                 )
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 155)
@@ -530,6 +542,7 @@ struct GS: View {
                                         return .qosExcellent.opacity(0.65)
                                     }
                                 }
+                                let visible = (p.visible == "1") ? true : false // 1: true, 2: false
                                 
                                 RoundedRectangle(cornerRadius: 15)
                                     .fill(Color.ivoryMist.opacity(1))
@@ -542,10 +555,18 @@ struct GS: View {
                                                     .scaleEffect(y: 0.8)
                                                     .foregroundStyle(Color.darkSlateGrey)
                                                 
-                                                Text("\(passMin) min · max \(p.maxEl.prefix(2))°")
-                                                    .font(.durElev)
-                                                    .foregroundStyle(Color.darkSlateGrey)
-                                                    .opacity(0.8)
+                                                HStack (spacing: 4) {
+                                                    Text("\(passMin) min · max \(p.maxEl.prefix(2))° ·")
+                                                        .font(.durElev)
+                                                        .foregroundStyle(Color.darkSlateGrey)
+                                                        .opacity(0.8)
+                                                    
+                                                    Image("visible")
+                                                        .resizable()
+                                                        .frame(width: 20, height: 20)
+                                                        .padding(0)
+                                                        .foregroundStyle(visible ? Color.prussianBlue : Color.prussianBlue.opacity(0.2))
+                                                }
                                             }
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             
@@ -569,7 +590,7 @@ struct GS: View {
                         .opacity(passesOpacity)
                         .offset(y: passesOffset)
                         .onAppear{
-                            withAnimation(.easeIn(duration: 1)) {
+                            withAnimation(.easeIn(duration: 0.6)) {
                                 passesOpacity = 1
                                 passesOffset = 0.0
                             }

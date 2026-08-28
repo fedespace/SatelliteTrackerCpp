@@ -18,7 +18,7 @@ struct Homepage: View {
     @Binding var endTime: Date
     @State private var showEndTime = false
     @State private var step: String = ""
-    @State private var showDetails: Bool = false
+    @Binding var showDetails: Bool
     @State private var mapC: MapCameraPosition = .camera(MapCamera(
         centerCoordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0),
         distance: 200_000_000,
