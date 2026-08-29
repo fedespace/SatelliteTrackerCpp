@@ -36,8 +36,8 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
     double timeE_min = epoch2mins(end);
     double tsince = timeS_min - time_TLE_min; // start value of the tsince
     double radius_earth = satrec.radiusearthkm;
-    double lat, lon;
-    std::vector<double> lat_vec, lon_vec;
+    double lat, lon, alt;
+    std::vector<double> lat_vec, lon_vec, alt_vec;
     std::vector<GroundTrack> gt;
 
     double finalDelta = timeE_min - time_TLE_min;
@@ -66,10 +66,11 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
         Vector3D r_teme = {r[0], r[1], r[2]};
         std::cout << "sat teme: " << r_teme.x << " " << r_teme.y << " " << r_teme.z << "\n";
         Vector3D r_ecef = rotateZ(R, r_teme);
-        ecef2ll(r_ecef, radius_earth, lat, lon);
+        ecef2ll(r_ecef, radius_earth, lat, lon, alt);
         lat_vec.push_back(lat);
         lon_vec.push_back(lon);
-        GroundTrack single_point = {tle.line1, tle.line2, tle.name, parameters.satnString, time_c, lat, lon};
+        alt_vec.push_back(alt);
+        GroundTrack single_point = {tle.line1, tle.line2, tle.name, parameters.satnString, time_c, lat, lon, alt};
         gt.push_back(single_point);
         
         // Update for the next iteration
@@ -94,6 +95,7 @@ nlohmann::json serialize_gt(std::vector<GroundTrack> gt) {
         result[time_string]["norad"] = gt[i].norad;
         result[time_string]["lat"] = gt[i].lat;
         result[time_string]["lon"] = gt[i].lon;
+        result[time_string]["alt"] = gt[i].alt;
     }
 
     return result;

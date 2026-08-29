@@ -25,19 +25,18 @@ class GroundTrackViewModel {
         points.values.first?.line2 ?? ""
     }
     var coord3dmap: [SIMD3<Float>] {
-        func latLonAltToSCNVector3(lat: Double, lon: Double, alt: Double, radius: Double) -> SIMD3<Float> {
+        func latLonAltToSCNVector3(lat: Double, lon: Double, alt: Double) -> SIMD3<Float> {
             let deg2rad = Double.pi / 180
-            let altitude_scaled: Double = 0.000070 * alt
+            let altitude_scaled: Double = 0.0001567889621 * alt
             let l = -lat*deg2rad
             let ll = lon*deg2rad
-            let R = radius + altitude_scaled
-            let x: Float = Float(-R * cos(l) * cos(ll))
-            let y: Float = Float(-R * sin(l))
-            let z: Float = Float(R * cos(l) * sin(ll))
+            let x: Float = Float(-altitude_scaled * cos(l) * cos(ll))
+            let y: Float = Float(-altitude_scaled * sin(l))
+            let z: Float = Float(altitude_scaled * cos(l) * sin(ll))
             return SIMD3(x: x, y: y, z: z)
         }
         return points.sorted { $0.key < $1.key }
-            .map { latLonAltToSCNVector3(lat: $0.value.lat, lon: $0.value.lon, alt: 1200.0, radius: 0.45)
+            .map { latLonAltToSCNVector3(lat: $0.value.lat, lon: $0.value.lon, alt: $0.value.alt)
             }
     }
     

@@ -10,21 +10,19 @@ import RealityKit
 import MapKit
 
 struct Map3d: View {
-    @State private var radiusEarth: Float = 0.45
+    @State private var radiusEarth: Float = 1
     @Binding var gtViewModel: GroundTrackViewModel
+    @Binding var detailsSatellite: SatelliteDetails
     static let whiteMaterial = SimpleMaterial(color: .white, isMetallic: false)
     // Initial rotation angle
     @State private var baseRotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
     @State private var currentRotation = simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
-    var curvedGt: MeshDescriptor{
-        var a = MeshDescriptor(name: "groundtrack")
-        a.positions = MeshBuffer(coord3dmap)
-        a.primitives = .triangles([0, 1, 2])
-        return a
-    }
     @Binding var coord3dmap: [SIMD3<Float>]
     @Binding var startTime: Date
     @Binding var endTime: Date
+    var ecc: Double {
+        return Double(detailsSatellite.apogee - detailsSatellite.perigee) / Double(detailsSatellite.apogee + detailsSatellite.perigee)
+    }
     // Time in the inputs
     var timeInput: DateFormatter {
         let timeInput = DateFormatter()
@@ -69,64 +67,179 @@ struct Map3d: View {
                     .font(Font.gsWindow)
                     .kerning(1)
                     .foregroundStyle(Color.ivoryMist)
-            
-            
-            // Create the 3d sphere
-            RealityView { content in
-                let mesh = MeshResource.generateSphere(radius: radiusEarth)
-                var material = PhysicallyBasedMaterial()
-                do {
-                    let texture = try await TextureResource(named: "earth_map")
-                    material.baseColor = PhysicallyBasedMaterial.BaseColor(texture: .init(texture))
-                    material.roughness = 0.3
-                } catch {
-                    print("Failed to load Earth texture: \(error)")
-                    material.baseColor = PhysicallyBasedMaterial.BaseColor(tint: .blue)
-                }
-                let sphereEntity = ModelEntity(mesh: mesh, materials: [material])
-                sphereEntity.generateCollisionShapes(recursive: false)
-                sphereEntity.components.set(InputTargetComponent())
-                sphereEntity.name = "earth"
-                content.add(sphereEntity)
                 
-                for i in 0..<(coord3dmap.count - 1) {
-                    let p1 = coord3dmap[i]
-                    let p2 = coord3dmap[i+1]
+                
+                HStack {
+                    // Type of orbit
+                    RoundedRectangle(cornerRadius: 30)
+                        .frame(width: 55, height: 28)
+                        .glassEffect(.regular)
+                        .overlay (
+                            Text("LEO")
+                                .font(.coord)
+                                .foregroundStyle(Color.ivoryMist)
+                        )
                     
-                    let mesh = MeshResource.generateCylinder(height: 1, radius: 0.005)
-                    let entity = ModelEntity(mesh: mesh, materials: [SimpleMaterial(color: .red, isMetallic: false)])
+                    // Altitude
+                    RoundedRectangle(cornerRadius: 30)
+                        .frame(width: 170, height: 28)
+                        .overlay (
+                            Text("420 km of altitude")
+                                .font(.coord)
+                                .foregroundStyle(Color.ivoryMist)
+                         )
+                        .glassEffect(.regular)
                     
-                    entity.scale.y = length(p2 - p1)
-                    entity.position = (p1 + p2) / 2
-                    entity.orientation = simd_quatf(from: SIMD3<Float>(0,1,0), to: normalize(p2 - p1))
+                    // Ave velocity
+                    RoundedRectangle(cornerRadius: 30)
+                        .frame(width: 110, height: 28)
+                        .glassEffect(.regular)
+                        .overlay (
+                            Text("7.66 km/s")
+                                .font(.coord)
+                                .foregroundStyle(Color.ivoryMist)
+                        )
                     
-                    sphereEntity.addChild(entity)
                 }
                 
-            } update: { content in
-                if let sphereEntity = content.entities.first(where: { $0.name == "earth" }) {
-                    sphereEntity.transform.rotation = currentRotation
+            
+                // Create the 3d sphere
+                RealityView { content in
+                    let mesh = MeshResource.generateSphere(radius: radiusEarth)
+                    var material = PhysicallyBasedMaterial()
+                    do {
+                        let texture = try await TextureResource(named: "earth_map")
+                        material.baseColor = PhysicallyBasedMaterial.BaseColor(texture: .init(texture))
+                        material.roughness = 0.3
+                    } catch {
+                        print("Failed to load Earth texture: \(error)")
+                        material.baseColor = PhysicallyBasedMaterial.BaseColor(tint: .blue)
+                    }
+                    let sphereEntity = ModelEntity(mesh: mesh, materials: [material])
+                    sphereEntity.generateCollisionShapes(recursive: false)
+                    sphereEntity.components.set(InputTargetComponent())
+                    sphereEntity.name = "earth"
+                    content.add(sphereEntity)
+                    
+                    for i in 0..<(coord3dmap.count - 1) {
+                        let p1 = coord3dmap[i]
+                        let p2 = coord3dmap[i+1]
+                        
+                        let mesh = MeshResource.generateCylinder(height: 1, radius: 0.005)
+                        let entity = ModelEntity(mesh: mesh, materials: [SimpleMaterial(color: .red, isMetallic: false)])
+                        
+                        entity.scale.y = length(p2 - p1)
+                        entity.position = (p1 + p2) / 2
+                        entity.orientation = simd_quatf(from: SIMD3<Float>(0,1,0), to: normalize(p2 - p1))
+                        
+                        sphereEntity.addChild(entity)
+                    }
+                    
+                } update: { content in
+                    if let sphereEntity = content.entities.first(where: { $0.name == "earth" }) {
+                        sphereEntity.transform.rotation = currentRotation
+                    }
                 }
-            }
-            .gesture(
-                DragGesture()
-                // get the gesture on the entire sphere
-                    .targetedToAnyEntity()
-                    .onChanged { a in
-                        let deltaX = Float(a.translation.width) / 200.0
-                        let deltaY = Float(a.translation.height) / 200.0
-                        let rotationX = simd_quatf(angle: deltaX, axis: SIMD3<Float>(0, 1, 0))
-                        let rotationY = simd_quatf(angle: deltaY, axis: SIMD3<Float>(1, 0, 0))
-                        currentRotation = rotationY * rotationX * baseRotation
+                .gesture(
+                    DragGesture()
+                    // get the gesture on the entire sphere
+                        .targetedToAnyEntity()
+                        .onChanged { a in
+                            let deltaX = Float(a.translation.width) / 200.0
+                            let deltaY = Float(a.translation.height) / 200.0
+                            let rotationX = simd_quatf(angle: deltaX, axis: SIMD3<Float>(0, 1, 0))
+                            let rotationY = simd_quatf(angle: deltaY, axis: SIMD3<Float>(1, 0, 0))
+                            currentRotation = rotationY * rotationX * baseRotation
+                        }
+                        .onEnded { a in
+                            baseRotation = currentRotation
+                        }
+                )
+                .padding(0)
+                .frame(width: 500, height: 330)
+                
+                VStack (spacing: 20) {
+                    Text("orbital details".uppercased())
+                        .font(.gsTitle)
+                        .foregroundStyle(Color.prussianBlue)
+                    
+                    HStack (spacing: 60) {
+                        VStack (alignment: .leading, spacing: 15) {
+                            VStack (alignment: .leading) {
+                                Text("Inclination".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(detailsSatellite.incl)".prefix(5))
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                            
+                            VStack (alignment: .leading) {
+                                Text("Apogee".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(detailsSatellite.apogee) km")
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                            
+                            VStack (alignment: .leading) {
+                                Text("Eccentricity".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(ecc)")
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                        }
+                        
+                        VStack (alignment: .leading, spacing: 15) {
+                            VStack (alignment: .leading) {
+                                Text("Period".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(detailsSatellite.period)")
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                            
+                            VStack (alignment: .leading) {
+                                Text("Perigee".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(detailsSatellite.perigee) km")
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                            
+                            VStack (alignment: .leading) {
+                                Text("Revs/day".uppercased())
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                                
+                                Text("\(ecc)")
+                                    .font(.coord)
+                                    .foregroundStyle(Color.prussianBlue)
+                            }
+                        }
                     }
-                    .onEnded { a in
-                        baseRotation = currentRotation
-                    }
-            )
+                }
+                .padding(.horizontal, 30)
+                .padding(.vertical, 20)
+                .glassEffect(.regular.tint(.prussianBlue.opacity(0.1)), in: .rect(cornerRadius: 20))
+                
+                Spacer()
+                
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 20)
             .padding(.top, 5)
+            
             
             Spacer()
         }
@@ -135,10 +248,28 @@ struct Map3d: View {
 
 #Preview {
     let mockGt = GroundTrackViewModel()
+    let satelliteDetails = SatelliteDetails(
+        objectName: "SKYLENS-DEMO 1",
+        objectType: "PAYLOAD",
+        noradID: 43205,
+        opsStatusCode: "+",
+        owner: "US",
+        launched: "2018-02-22",
+        launchSite: "VAFB",
+        decay: "",
+        period: 94.6,
+        incl: 97.4,
+        apogee: 575,
+        perigee: 560,
+        rcs: 1.8,
+        dataStatusCode: "",
+        orbitCenter: "EA",
+        orbitType: "SSO"
+    )
     mockGt.points = [
-        "0": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 45.0, lon: -30.0),
-        "1": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 46.2, lon: -25.5),
-        "2": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 47.1, lon: -20.1)
+        "0": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 45.0, lon: -30.0, alt: 1200),
+        "1": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 46.2, lon: -25.5, alt: 1200),
+        "2": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 47.1, lon: -20.1, alt: 1200)
     ]
-    return Map3d(gtViewModel: .constant(mockGt), coord3dmap: .constant(mockGt.coord3dmap), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)))
+    return Map3d(gtViewModel: .constant(mockGt), detailsSatellite: .constant(satelliteDetails),  coord3dmap: .constant(mockGt.coord3dmap), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)))
 }

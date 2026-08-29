@@ -25,6 +25,7 @@ struct TabBar: View {
     @State private var inputType: InputOptions = .name
     @State private var searchItem: String?
     @State private var gtViewModel = GroundTrackViewModel()
+    @State private var detailsSatellite = SatelliteDetails.empty
     @State private var showDetails: Bool = false
     @State private var offsetBubble: CGFloat = -120.0
     
@@ -35,9 +36,9 @@ struct TabBar: View {
             // Assign the number to the tab
             switch(selectedTab) {
             case .menu_map2d:
-                Homepage(inputType: $inputType, searchItem: $searchItem, gtViewModel: $gtViewModel, startTime: $startTime, endTime: $endTime, showDetails: $showDetails, sat: $sat)
+                Homepage(inputType: $inputType, searchItem: $searchItem, gtViewModel: $gtViewModel, startTime: $startTime, endTime: $endTime, showDetails: $showDetails, detailsSatellite: .constant(detailsSatellite), sat: $sat)
             case .menu_map3d:
-                Map3d(gtViewModel: $gtViewModel, coord3dmap: .constant(gtViewModel.coord3dmap), startTime: $startTime, endTime: $endTime)
+                Map3d(gtViewModel: $gtViewModel, detailsSatellite: .constant(detailsSatellite), coord3dmap: .constant(gtViewModel.coord3dmap), startTime: $startTime, endTime: $endTime)
             case .menu_gs:
                 GS(satellite: $sat, startTime: $startTime, endTime: $endTime, inputType: $inputType, searchItem: $searchItem, gtViewModel: $gtViewModel)
             case .menu_alerts:

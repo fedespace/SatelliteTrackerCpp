@@ -19,4 +19,4 @@ Matrix3x3 rotation_teme2ecef(double angle);
 // Performing the matrix-vector product
 Vector3D rotateZ(const Matrix3x3 R, const Vector3D v);
 
-void ecef2ll(Vector3D r, double rE, double& lat, double& lon);
+void ecef2ll(Vector3D r, double rE, double& lat, double& lon, double& alt);

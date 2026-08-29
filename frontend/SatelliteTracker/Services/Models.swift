@@ -15,6 +15,7 @@ struct GroundTrackPoint: Codable {
     let norad: String
     let lat: Double
     let lon: Double
+    let alt: Double
 }
 
 struct TleRequest: Codable {

@@ -27,7 +27,7 @@ struct Homepage: View {
     ))
     @State private var detailsViewModel = SatelliteDetailsViewModel()
     var noradID: String { gtViewModel.norad }
-    @State private var detailsSatellite = SatelliteDetails.empty
+    @Binding var detailsSatellite: SatelliteDetails
     @State private var isDetailVisible: Bool = false
     var opsStatus: String {detailsSatellite.opsStatusCode}
     var owner: String {detailsSatellite.owner}

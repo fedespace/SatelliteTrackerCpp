@@ -17,6 +17,7 @@ struct GroundTrack {
     TimeUTC time;
     double lat;
     double lon;
+    double alt;
 };
 
 std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double step);

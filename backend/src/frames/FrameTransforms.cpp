@@ -20,7 +20,7 @@ Vector3D rotateZ(const Matrix3x3 R, const Vector3D v){
     };
 }
 
-void ecef2ll(Vector3D r, double rE, double& lat, double& lon) {
+void ecef2ll(Vector3D r, double rE, double& lat, double& lon, double& alt) {
     lon = std::atan2(r.y,r.x) * 180 / M_PI; // [deg]
     if (lon > 180) {
         lon -= 360;
@@ -33,17 +33,15 @@ void ecef2ll(Vector3D r, double rE, double& lat, double& lon) {
     double earth_ecc_squared = 0.006694385;
 
     // Loop
+    double N;
     while (std::abs(lat - lat_0) > 1e-10) {
         lat_0 = lat;
-        double N = rE / (std::sqrt(1 - earth_ecc_squared * std::pow(std::sin(lat_0),2)));
+        N = rE / (std::sqrt(1 - earth_ecc_squared * std::pow(std::sin(lat_0),2)));
         lat = std::atan2(r.z + earth_ecc_squared * N * std::sin(lat), p);
     }
 
+    alt = p / cos(lat) - N;
+
     lat = lat * 180 / M_PI;
-
-    // if (lon > 180) {
-    //     lon = 180 - lon;
-    // }
-    // lat = std::asin(r.z/r.norm()) * 180 / M_PI; // [deg]
-
+    
 }
