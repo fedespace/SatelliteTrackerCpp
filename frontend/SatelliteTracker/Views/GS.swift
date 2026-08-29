@@ -128,7 +128,7 @@ struct GS: View {
                             .frame(width: 30, height: 30)
                         
                         //Text("gtViewModel.satName")
-                        Text("ISS ZARYA")
+                        Text($gtViewModel.satName.wrappedValue)
                             .font(.gsTitle)
                             .kerning(8)
                             .scaleEffect(y: 0.9)
@@ -335,7 +335,7 @@ struct GS: View {
                 
                 
                 // Passes container
-                if true {//showPasses {
+                if showPasses {
                     
                     // Pass containers
                     if (passModel.passes.first != nil) {

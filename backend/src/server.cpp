@@ -153,7 +153,7 @@ int main() {
             result[id]["maxEl"] = std::to_string(passes[i].max_el);
             result[id]["duration"] = std::to_string(passes[i].duration);
             result[id]["quality"] = passes[i].qos;
-            result[id]["passIsVisible"] = passes[i].passIsVisible;
+            result[id]["visible"] = std::to_string(passes[i].passIsVisible);
             }
         
         res.set_content(result.dump(), "application/json");
