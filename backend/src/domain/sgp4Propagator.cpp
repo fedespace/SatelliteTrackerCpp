@@ -64,7 +64,6 @@ std::vector<GroundTrack> propagate (Tle tle, TimeUTC start, TimeUTC end, double 
 
         Matrix3x3 R = rotation_teme2ecef(gstime);
         Vector3D r_teme = {r[0], r[1], r[2]};
-        std::cout << "sat teme: " << r_teme.x << " " << r_teme.y << " " << r_teme.z << "\n";
         Vector3D r_ecef = rotateZ(R, r_teme);
         ecef2ll(r_ecef, radius_earth, lat, lon, alt);
         lat_vec.push_back(lat);

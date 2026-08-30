@@ -27,7 +27,7 @@ class GroundTrackViewModel {
     var coord3dmap: [SIMD3<Float>] {
         func latLonAltToSCNVector3(lat: Double, lon: Double, alt: Double) -> SIMD3<Float> {
             let deg2rad = Double.pi / 180
-            let altitude_scaled: Double = 0.0001567889621 * alt
+            let altitude_scaled: Double = 0.0001411100659 * alt // 0.9/earthRadius
             let l = -lat*deg2rad
             let ll = lon*deg2rad
             let x: Float = Float(-altitude_scaled * cos(l) * cos(ll))

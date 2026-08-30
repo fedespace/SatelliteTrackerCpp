@@ -263,7 +263,6 @@ std::vector<PassPrediction> passTimes(Tle tle, TimeUTC tstart, TimeUTC tend, dou
                 // Is the sky dark enough
                 std::vector<double> s_eci = sun_eci(jd_full_v);
                 isDark = observer_darkness(s_eci, gs_ecef, vt, -6.0);
-                std::cout << "light & darkness:" << isSatelliteInLight << " " << isDark << "\n";
                 // Combining the two checks
                 if (isSatelliteInLight && isDark) {
                     singlePass.passIsVisible = true;

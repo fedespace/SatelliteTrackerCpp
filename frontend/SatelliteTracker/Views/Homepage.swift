@@ -28,6 +28,7 @@ struct Homepage: View {
     @State private var detailsViewModel = SatelliteDetailsViewModel()
     var noradID: String { gtViewModel.norad }
     @Binding var detailsSatellite: SatelliteDetails
+    var raisedError: Bool {detailsViewModel.raisedError}
     @State private var isDetailVisible: Bool = false
     var opsStatus: String {detailsSatellite.opsStatusCode}
     var owner: String {detailsSatellite.owner}
@@ -71,7 +72,6 @@ struct Homepage: View {
                         InputPicker(inputType: $inputType, searchItem: $searchItem, detailsSatellite: $detailsSatellite, endTime: $endTime, startTime: $startTime, showDetails: $showDetails, showEndTime: $showEndTime, gtViewModel: $gtViewModel, step: $step, favouritesStore: favouritesStore)
                             .onSubmit {
                                 Task {
-                                    detailsSatellite = SatelliteDetails.empty
                                     endTime = (showEndTime) ? endTime : startTime.addingTimeInterval(1.0)
                                     if (endTime > startTime) {
                                         await gtViewModel.fetchGroundTrack(inputType: inputType, searchItem: searchItem!.uppercased(), start: startTime, end: endTime, step: step)
@@ -142,7 +142,7 @@ struct Homepage: View {
                                             
                                         )
                                 .padding(.vertical, 10)
-                                .frame(width: 220, height: 30)
+                                .frame(width: 230, height: 30)
                                 .glassEffect(.regular.tint(.ivoryMist.opacity(0.1)))
                             }
                             .overlay {
@@ -229,7 +229,7 @@ struct Homepage: View {
                                                 
                                             )
                                     .padding(.vertical, 10)
-                                    .frame(width: 220, height: 30)
+                                    .frame(width: 230, height: 30)
                                     .glassEffect(.regular.tint(.ivoryMist.opacity(0.1)))
                                 }
                                 .overlay {
@@ -321,7 +321,7 @@ struct Homepage: View {
                         .padding(.bottom,15)
                     }
                     
-                    if(showDetails) {
+                    if(showDetails && !raisedError) {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             GlassEffectContainer {
                                 VStack { // the entire bubble for all details
@@ -362,14 +362,14 @@ struct Homepage: View {
                                             .font(Font.detailBody).foregroundStyle(Color.darkSlateGrey)
                                         
                                     }
-                                        
+                                    
                                     VStack (alignment: .trailing) {
                                         Text("Orbital Elements").font(Font.subtitleDetail)
                                         Text("Period: \(periodOrbit.formatted(.number.precision(.fractionLength(2)))) min")
                                         Text("Semi-major Axis: \(a.formatted(.number.precision(.fractionLength(2)))) km")
                                         Text("Inclination: \(inclinationOrbit.formatted(.number.precision(.fractionLength(2)))) degrees")
-                                        Text("Apogee Altitude: \(apogee.formatted(.number.precision(.fractionLength(2)))) km")
-                                        Text("Perigee Altitude: \(perigee.formatted(.number.precision(.fractionLength(2)))) km")
+                                        Text("Apogee Altitude: \(apogee.formatted(.number.precision(.fractionLength(0)))) km")
+                                        Text("Perigee Altitude: \(perigee.formatted(.number.precision(.fractionLength(0)))) km")
                                     }
                                     .padding(.top, 15)
                                     .frame(maxWidth: .infinity)
@@ -391,6 +391,36 @@ struct Homepage: View {
                         
                         }
                         
+                    }
+                    
+                    if(showDetails && raisedError) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            GlassEffectContainer {
+                                VStack (alignment: .center) { // the entire bubble for all details
+                                    Text("\(gtViewModel.satName) • \(gtViewModel.norad)")
+                                        .font(Font.detailTitle).foregroundStyle(Color.darkSlateGrey)
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                        .padding(.bottom, 15)
+                                    
+                                    VStack (alignment: .leading) {
+                                        Text("An error occurred while fetching orbital data.").font(Font.subtitleDetail)
+                                        Text("Try again later.").font(Font.subtitleDetail)
+                                    }
+                                }
+                                .padding(.vertical, 30)
+                                .frame(maxWidth: .infinity, minHeight: 150.0)
+                                .opacity(isDetailVisible ? 1 : 0)
+                                .onChange(of: noradID, { oldValue, newValue in
+                                    Task {
+                                        detailsSatellite = await detailsViewModel.fetchDetails(norad: newValue)
+                                        withAnimation {
+                                            isDetailVisible = true
+                                        }
+                                    }
+                                })
+                            }
+                            .glassEffect(.regular, in: .rect(cornerRadius: 20))
+                        }
                     }
                     
                     Spacer()

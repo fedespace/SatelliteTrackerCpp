@@ -11,6 +11,7 @@ import SwiftUI
 class SatelliteDetailsViewModel {
     var errorMessage: String? = nil
     var details = SatelliteDetails.empty
+    var raisedError: Bool { errorMessage != nil }
 
     func fetchDetails(norad: String) async -> SatelliteDetails {
         do {

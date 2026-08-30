@@ -10,8 +10,9 @@ import RealityKit
 import MapKit
 
 struct Map3d: View {
-    @State private var radiusEarth: Float = 1
+    @State private var radiusEarth: Float = 0.9
     @Binding var gtViewModel: GroundTrackViewModel
+    @State private var detailsViewModel = SatelliteDetailsViewModel()
     @Binding var detailsSatellite: SatelliteDetails
     static let whiteMaterial = SimpleMaterial(color: .white, isMetallic: false)
     // Initial rotation angle
@@ -20,9 +21,25 @@ struct Map3d: View {
     @Binding var coord3dmap: [SIMD3<Float>]
     @Binding var startTime: Date
     @Binding var endTime: Date
-    var ecc: Double {
-        return Double(detailsSatellite.apogee - detailsSatellite.perigee) / Double(detailsSatellite.apogee + detailsSatellite.perigee)
+    var norad: String {
+        $gtViewModel.norad.wrappedValue
     }
+    var incl: Double {detailsSatellite.incl}
+    var apo: Int {detailsSatellite.apogee}
+    var peri: Int {detailsSatellite.perigee}
+    var period: Double {detailsSatellite.period}
+    var orbitType: String {detailsSatellite.orbitType}
+    var altitude: Int {(apo + peri)/2}
+    var semimajorAxis: Double {Double(apo + peri)/2 + 6371}
+    var meanSpeed: Double {2*Double.pi*semimajorAxis/period}
+    var revsDay: Double {1440/period}
+    var ecc: Double {
+        var rEarth = 6371 // mean value [km]
+        var ra = Double(detailsSatellite.apogee + rEarth)
+        var rp = Double(detailsSatellite.perigee + rEarth)
+        return Double(ra - rp) / Double(ra + rp)
+    }
+    
     // Time in the inputs
     var timeInput: DateFormatter {
         let timeInput = DateFormatter()
@@ -42,31 +59,34 @@ struct Map3d: View {
             
             Color.yaleBlue.ignoresSafeArea()
             
-            VStack(spacing: 10) {
-                HStack(spacing: 20) {
+            VStack(spacing: 15) {
+                VStack (spacing: 0) {
+                    HStack(spacing: 20) {
+                        
+                        Image("satellite")
+                            .resizable()
+                            .foregroundStyle(Color.ivoryMist)
+                            .frame(width: 30, height: 30)
+                        
+                        //Text("gtViewModel.satName")
+                        Text($gtViewModel.satName.wrappedValue)
+                            .font(.gsTitle)
+                            .kerning(8)
+                            .scaleEffect(y: 0.9)
+                            .foregroundStyle(Color.ivoryMist)
+                    }
                     
-                    Image("satellite")
-                        .resizable()
-                        .foregroundStyle(Color.ivoryMist)
-                        .frame(width: 30, height: 30)
+                    let fromDateString = futurePass.string(from: $startTime.wrappedValue)
+                    let fromTimeString = timeInput.string(from: $startTime.wrappedValue)
+                    let toDateString = futurePass.string(from: $endTime.wrappedValue)
+                    let toTimeString = timeInput.string(from: $endTime.wrappedValue)
                     
-                    //Text("gtViewModel.satName")
-                    Text($gtViewModel.satName.wrappedValue)
-                        .font(.gsTitle)
-                        .kerning(8)
-                        .scaleEffect(y: 0.9)
+                    Text("\(fromDateString) \(fromTimeString) → \(toDateString) \(toTimeString)")
+                        .font(Font.gsWindow)
+                        .kerning(1)
                         .foregroundStyle(Color.ivoryMist)
                 }
-                
-                let fromDateString = futurePass.string(from: $startTime.wrappedValue)
-                let fromTimeString = timeInput.string(from: $startTime.wrappedValue)
-                let toDateString = futurePass.string(from: $endTime.wrappedValue)
-                let toTimeString = timeInput.string(from: $endTime.wrappedValue)
-                
-                Text("\(fromDateString) \(fromTimeString) → \(toDateString) \(toTimeString)")
-                    .font(Font.gsWindow)
-                    .kerning(1)
-                    .foregroundStyle(Color.ivoryMist)
+                .padding(.top, 10)
                 
                 
                 HStack {
@@ -75,7 +95,7 @@ struct Map3d: View {
                         .frame(width: 55, height: 28)
                         .glassEffect(.regular)
                         .overlay (
-                            Text("LEO")
+                            Text("\(orbitType)")
                                 .font(.coord)
                                 .foregroundStyle(Color.ivoryMist)
                         )
@@ -84,10 +104,10 @@ struct Map3d: View {
                     RoundedRectangle(cornerRadius: 30)
                         .frame(width: 170, height: 28)
                         .overlay (
-                            Text("420 km of altitude")
+                            Text("\(altitude) km of altitude")
                                 .font(.coord)
                                 .foregroundStyle(Color.ivoryMist)
-                         )
+                        )
                         .glassEffect(.regular)
                     
                     // Ave velocity
@@ -95,14 +115,14 @@ struct Map3d: View {
                         .frame(width: 110, height: 28)
                         .glassEffect(.regular)
                         .overlay (
-                            Text("7.66 km/s")
+                            Text("\(meanSpeed) km/s")
                                 .font(.coord)
                                 .foregroundStyle(Color.ivoryMist)
                         )
                     
                 }
                 
-            
+                
                 // Create the 3d sphere
                 RealityView { content in
                     let mesh = MeshResource.generateSphere(radius: radiusEarth)
@@ -156,21 +176,21 @@ struct Map3d: View {
                         }
                 )
                 .padding(0)
-                .frame(width: 500, height: 330)
+                .frame(width: 500, height: 360)
                 
-                VStack (spacing: 20) {
+                VStack (spacing: 10) {
                     Text("orbital details".uppercased())
                         .font(.gsTitle)
                         .foregroundStyle(Color.prussianBlue)
                     
                     HStack (spacing: 60) {
-                        VStack (alignment: .leading, spacing: 15) {
+                        VStack (alignment: .leading, spacing: 10) {
                             VStack (alignment: .leading) {
                                 Text("Inclination".uppercased())
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(detailsSatellite.incl)".prefix(5))
+                                Text("\(incl.formatted(.number.precision(.fractionLength(2))))".prefix(5))
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
@@ -180,7 +200,7 @@ struct Map3d: View {
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(detailsSatellite.apogee) km")
+                                Text("\(apo) km")
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
@@ -190,19 +210,19 @@ struct Map3d: View {
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(ecc)")
+                                Text("\(ecc.formatted(.number.precision(.fractionLength(4))))")
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
                         }
                         
-                        VStack (alignment: .leading, spacing: 15) {
+                        VStack (alignment: .leading, spacing: 10) {
                             VStack (alignment: .leading) {
                                 Text("Period".uppercased())
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(detailsSatellite.period)")
+                                Text("\(period.formatted(.number.precision(.fractionLength(2)))) min")
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
@@ -212,7 +232,7 @@ struct Map3d: View {
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(detailsSatellite.perigee) km")
+                                Text("\(peri) km")
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
@@ -222,17 +242,21 @@ struct Map3d: View {
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                                 
-                                Text("\(ecc)")
+                                Text("\(revsDay.formatted(.number.precision(.fractionLength(2))))")
                                     .font(.coord)
                                     .foregroundStyle(Color.prussianBlue)
                             }
                         }
                     }
                 }
-                .padding(.horizontal, 30)
-                .padding(.vertical, 20)
+                .padding(.horizontal, 25)
+                .padding(.vertical, 15)
                 .glassEffect(.regular.tint(.prussianBlue.opacity(0.1)), in: .rect(cornerRadius: 20))
-                
+                .onChange(of: norad, { oldValue, newValue in
+                    Task {
+                        detailsSatellite = await detailsViewModel.fetchDetails(norad: newValue)
+                    }
+                })
                 Spacer()
                 
             }
@@ -271,5 +295,5 @@ struct Map3d: View {
         "1": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 46.2, lon: -25.5, alt: 1200),
         "2": GroundTrackPoint(line1: "1 25544U 98067A...", line2: "2 25544  51.6400...", name: "ISS (ZARYA)", norad: "25544", lat: 47.1, lon: -20.1, alt: 1200)
     ]
-    return Map3d(gtViewModel: .constant(mockGt), detailsSatellite: .constant(satelliteDetails),  coord3dmap: .constant(mockGt.coord3dmap), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)))
+    return Map3d(gtViewModel: .constant(mockGt), detailsSatellite: .constant(satelliteDetails), coord3dmap: .constant(mockGt.coord3dmap), startTime: .constant(Date.now), endTime: .constant(Date.now.addingTimeInterval(86400)))
 }
