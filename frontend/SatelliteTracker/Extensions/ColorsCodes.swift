@@ -21,4 +21,7 @@ extension Color {
     static let qosGood = Color(red: 0.616, green: 0.765, blue: 0.878)
     static let qosFair = Color(red: 0.949, green: 0.706, blue: 0.451)
     static let qosPoor = Color(red: 0.941, green: 0.502, blue: 0.502)
+    static let pastelGreen = Color(red: 186/255, green: 242/255, blue: 187/255)
+    static let jungleTeal = Color(red: 65/255, green: 123/255, blue: 90/255)
+    static let lightJungleTeal = Color(red: 150/255, green: 200/255, blue: 171/255)
 }

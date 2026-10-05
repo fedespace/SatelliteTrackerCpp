@@ -54,5 +54,11 @@ extension Font {
     static let passData = Font.custom("Rajdhani-Bold", size: 19)
     static let firstPass = Font.custom("Rajdhani-SemiBold", size: 18)
     static let durElev = Font.custom("Electrolize", size: 17)
+    
+    // Alerts
+    static let subtitleAlerts = Font.custom("Electrolize", size: 18)
+    static let locationToggle = Font.custom("Electrolize", size: 17)
+    static let notifyMeWhen = Font.custom("Eunomia-Regular", size: 30)
+    static let generateAlert = Font.custom("Eunomia-Regular", size: 25)
 }
 
